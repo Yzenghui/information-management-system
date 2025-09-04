@@ -1,0 +1,63 @@
+# 忽略 Eclipse 的核心工作区文件
+.metadata/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.idea/
+
+# 忽略所有 .class 文件（编译后的Java字节码）
+*.class
+
+# 忽略特定的Eclipse项目文件
+.project
+.classpath
+.factorypath
+
+# 忽略输出目录（如果Maven，则为target/；如果Gradle，则为build/）
+target/
+build/
+output/
+
+# 忽略日志文件
+*.log
+logs/
+
+# 忽略Mac系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 忽略Windows系统文件
+# 如需使用Windows，取消下面部分的注释
+# [Dd]esktop.ini
+# $RECYCLE.BIN/
+
+# 忽略IDE的本地历史文件
+.history/
+
+# 忽略任何可能存在的敏感配置文件（如数据库连接信息）
+*.properties
+*.cfg
+*.config
+!db.example.properties # 不忽略示例配置文件，但需要确保它不包含真实密码
+
+# 忽略由打包工具或依赖管理工具生成的JAR文件
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# 忽略依赖目录（如Node.js的node_modules，但Java项目通常没有）
+# node_modules/
