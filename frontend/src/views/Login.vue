@@ -32,7 +32,7 @@
             placeholder="请输入用户名"
             size="large"
             prefix-icon="el-icon-user"
-            @keyup.enter="handleLogin"
+            @keyup.enter.native="handleLogin"
           />
         </el-form-item>
 
@@ -48,7 +48,7 @@
             size="large"
             prefix-icon="el-icon-lock"
             show-password
-            @keyup.enter="handleLogin"
+            @keyup.enter.native="handleLogin"
           />
         </el-form-item>
 
@@ -155,8 +155,7 @@ export default {
     },
 
     goToRegister() {
-      this.$message.info("注册功能开发中...");
-      // 后续添加：this.$router.push('/register')
+      this.$router.push('/register')
     },
   },
 

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <!-- 登录页面独立显示，其他页面显示完整布局 -->
-    <router-view v-if="$route.path === '/login'" />
+    <!-- 登录页面与注册页面独立显示，其他页面显示完整布局 -->
+    <router-view v-if="$route.path === '/login' || $route.path === '/register'" />
     <div v-else class="main-layout">
       <!-- 这里后续添加导航栏、侧边栏等公共布局 -->
       <router-view />

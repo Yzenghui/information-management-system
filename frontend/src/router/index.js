@@ -20,6 +20,12 @@ const routes = [
     meta: { requiresAuth: false }, // 不需要登录
   },
   {
+    path: "/register",
+    name: "register",
+    component: () => import("../views/Register.vue"),
+    meta: { requiresAuth: false }, // 不需要登录
+  },
+  {
     path: "/about",
     name: "about",
     // About 路由使用懒加载，优化性能
@@ -46,8 +52,8 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !isLoggedIn) {
     // 需要登录但未登录，跳转到登录页
     next("/login");
-  } else if (to.path === "/login" && isLoggedIn) {
-    // 已登录但访问登录页，跳转到首页
+  } else if ((to.path === '/login' || to.path === '/register') && isLoggedIn) {
+    // 已登录但访问登录页或注册页，跳转到首页
     next("/");
   } else {
     // 正常放行
