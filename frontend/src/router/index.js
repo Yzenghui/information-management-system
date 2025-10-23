@@ -48,6 +48,11 @@ const routes = [
         name: "delete",
         component: () => import("@/views/Delete.vue"),
       },
+      {
+        path: "profile",
+        name: "profile",
+        component: () => import("@/views/Profile.vue"),
+      },
     ],
   },
 ];

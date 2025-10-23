@@ -26,6 +26,11 @@
           <i class="el-icon-delete"></i>
           <span>信息删除</span>
         </el-menu-item>
+
+        <el-menu-item index="/profile">
+          <i class="el-icon-user-solid"></i>
+          <span>个人信息</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
 
@@ -167,7 +172,7 @@ export default {
 }
 
 .welcome-page h1 {
-  color: #409EFF;
+  color: #409eff;
   font-size: 36px;
   margin-bottom: 20px;
 }
@@ -176,5 +181,4 @@ export default {
   color: #606266;
   font-size: 16px;
 }
-
 </style>
