@@ -4,7 +4,10 @@
 
     <!-- 搜索表单 -->
     <el-card class="search-card">
-      <!-- @submit.native.prevent阻止默认的提交行为（页面刷新） -->
+      <!-- @submit.native.prevent阻止默认的提交行为（页面刷新）
+      单输入框表单：只有一个输入框时，回车触发表单提交（浏览器默认）,需要 @submit.native.prevent 阻止刷新
+      多输入框表单：有多个输入框时，回车触发切换到下一个输入框（浏览器默认）,不需要阻止默认行为 -->
+      
       <el-form :model="searchForm" @submit.native.prevent ref="searchFormRef">
         <el-form-item label="姓名">
           <el-input
