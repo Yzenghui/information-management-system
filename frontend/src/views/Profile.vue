@@ -4,7 +4,7 @@
     
     <el-card class="profile-card">
       <!-- 基本信息 -->
-      <el-form :model="profileForm" label-width="100px">
+      <el-form :model="profileForm" :label-position="labelPosition" label-width="100px">
         <el-form-item label="用户名">
             <!-- disabled 作用是禁用输入框 -->
           <el-input v-model="profileForm.username" disabled></el-input>
@@ -18,11 +18,13 @@
 
     <!-- 修改密码 -->
     <el-card class="password-card">
+      <!-- <div slot="header"> 是 Vue的插槽(slot)语法
+      指定这个div要插入到el-card组件的header插槽位置 -->
       <div slot="header">
         <span>修改密码</span>
       </div>
       
-      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="100px">
+      <el-form :model="passwordForm" :rules="passwordRules" :label-position="labelPosition" ref="passwordFormRef" label-width="100px">
         <el-form-item label="原密码" prop="oldPassword">
           <!-- show-password 是显示密码可见性切换按钮 -->
           <el-input v-model="passwordForm.oldPassword" type="password" show-password></el-input>
@@ -37,6 +39,7 @@
         </el-form-item>
         
         <el-form-item>
+          <!-- 在此处，按钮对齐的是上面的标签 -->
           <el-button type="primary" @click="handleChangePassword">修改密码</el-button>
           <el-button @click="handleResetPassword">重置</el-button>
         </el-form-item>
@@ -59,6 +62,7 @@ export default {
     };
 
     return {
+      screenWidth: document.documentElement.clientWidth, // 添加屏幕宽度监听
       profileForm: {
         username: localStorage.getItem("username") || "用户",
         registerTime: "2024-01-01" // 模拟数据
@@ -83,6 +87,12 @@ export default {
       }
     };
   },
+  computed: {
+    // 根据屏幕宽度动态调整标签位置
+    labelPosition() {
+      return this.screenWidth < 768 ? 'top' : 'right';
+    }
+  },
   methods: {
     handleChangePassword() {
       this.$refs.passwordFormRef.validate((valid) => {
@@ -95,7 +105,19 @@ export default {
     },
     handleResetPassword() {
       this.$refs.passwordFormRef.resetFields();
+    },
+    // 监听窗口大小变化
+    handleResize() {
+      this.screenWidth = document.documentElement.clientWidth;
     }
+  },
+  mounted() {
+    // 添加窗口大小变化监听
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    // 移除监听器，防止内存泄漏
+    window.removeEventListener('resize', this.handleResize);
   }
 };
 </script>
@@ -110,5 +132,18 @@ export default {
 }
 .password-card {
   margin-top: 20px;
+}
+
+/* 响应式样式 */
+@media screen and (max-width: 768px) {
+  .profile-page {
+    padding: 15px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .profile-page {
+    padding: 10px;
+  }
 }
 </style>
