@@ -1,5 +1,5 @@
 # =============================================
-# 操作系统生成文件
+# 通用规则（所有平台/工具）
 # =============================================
 .DS_Store
 .DS_Store?
@@ -9,86 +9,65 @@
 ehthumbs.db
 Thumbs.db
 *~
-
-# =============================================
-# IDE和编辑器文件
-# =============================================
-# Eclipse
-.metadata/
-bin/
-tmp/
+*.swp
+*.swo
 *.tmp
 *.bak
-*.swp
-*~.nib
-local.properties
-.settings/
-.loadpath
-.project
-.classpath
-.factorypath
-
-# IntelliJ IDEA
-.idea/
-*.iws
-*.iml
-*.ipr
-out/
-
-# VS Code
-.vscode/
-
-# 本地历史
+*.log
 .history/
 
 # =============================================
-# 前端相关 (Vue/Node.js) - 新增内容
+# 前端 (frontend/)
 # =============================================
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-dist/
-build/
-.env
-.env.local
-.cache/
-.parcel-cache/
-
-# =============================================
-# 后端相关 (Java/Spring Boot)
-# =============================================
-# 编译输出
-*.class
-target/
-build/
-output/
-
-# 打包文件
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# 日志文件
-*.log
-logs/
-
-# Maven包装器
-.mvn/wrapper/maven-wrapper.jar
-
-# 敏感配置文件保护
-*.properties
-*.cfg
-*.config
-!*.template
-!*.example
-!db.example.properties
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/.nuxt/
+frontend/.cache/
+frontend/.parcel-cache/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/.env.local
+frontend/.env.*.local
 
 # =============================================
-# 项目特定规则
+# 后端 (backend/)
+# =============================================
+# 编译与构建
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/*.iml
+backend/*.iws
+backend/*.ipr
+
+# IDE（全局忽略，无需子目录规则）
+.idea/
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+.sts4-cache
+.nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+
+# 敏感配置（安全策略）
+backend/**/application-local.properties
+backend/**/application-dev.properties
+backend/**/*-local.yml
+backend/**/*-dev.yml
+# 保留模板文件（团队共享配置示例）
+!backend/**/*template*
+!backend/**/*example*
+
+# =============================================
+# 项目特定
 # =============================================
 legacy/bin/
 legacy/target/
