@@ -119,8 +119,8 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("username");
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       this.$router.push("/login");
     },
     // 切换侧边栏折叠状态

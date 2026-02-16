@@ -119,50 +119,88 @@ export default {
     };
   },
   methods: {
-    handleLogin() {
+    // 处理登录逻辑
+    async handleLogin() {
       // this 指向：当前 Vue 组件实例
       // $ 前缀：Vue 的实例属性/方法标识
       // validate(callback: Function)：来自 Element UI 的 Form 组件
       // callback: Function为回调函数
       // 箭头函数没有自己的 this，继承外层作用域的 this
       // 普通函数有自己的 this，在回调中被重置为 window
-      this.$refs.loginFormRef.validate((valid) => {
+      this.$refs.loginFormRef.validate(async (valid) => {
         if (valid) {
           this.loading = true;
 
-          // 模拟登录API调用
-          // setTimeout(callback: Function, delay: number)：JavaScript 原生定时器函数
-          setTimeout(() => {         // 模拟网络延迟
-            this.loading = false;    // 关闭加载状态
+          // 登录API调用
+          try {
+            // 发送POST请求到后端登录接口
+            // this.$http 是在 main.js 中挂载的 axios 实例
+            const response = await this.$http.post('/api/auth/login', {
+              username: this.loginForm.username,
+              password: this.loginForm.password
+            });
 
-            // 模拟登录成功
-            if (this.loginForm.username && this.loginForm.password) {
-              this.$message.success("登录成功！"); // 绿色背景，成功图标
-              // 在浏览器本地存储中设置登录标志（后续替换为真实token）
-              localStorage.setItem("isLoggedIn", "true");
-              // 保存当前登录的用户名到本地存储（密码永不存储在前端本地）
-              localStorage.setItem("username", this.loginForm.username);
+            // response.data 是后端返回的 Result 对象
+            const result = response.data;
+
+            // 判断业务状态码：200 表示登录成功
+            if (result.code === 200) {
+              // 登录成功：存储真实 JWT token 到 localStorage
+              // 后续每个请求都需要在请求头携带此 token
+              localStorage.setItem('token', result.data.token);
+              
+              // 存储用户基本信息（不含密码）到 localStorage
+              // JSON.stringify 将对象转换为 JSON 字符串存储
+              localStorage.setItem('user', JSON.stringify(result.data));
+
+              // 成功提示：绿色背景，成功图标
+              this.$message.success("登录成功！");
               
               // 跳转到首页
               this.$router.push("/");
             } else {
-              this.$message.error("用户名或密码错误"); // 红色背景，错误图标
+              // 登录失败：后端返回了业务错误（如401用户名密码错误）
+              // 使用后端返回的错误信息，更友好
+              this.$message.error(result.message || "登录失败");
             }
-          }, 1500);
+          } catch (error) {
+            // 网络错误、跨域错误、服务器未启动、超时等异常
+            console.error("登录请求异常:", error);
+            
+            // 详细错误分类处理，提升用户体验
+            if (error.response) {
+              // 服务器有响应，但返回了错误状态码（4xx、5xx）
+              const status = error.response.status;
+              if (status === 401) {
+                this.$message.error("用户名或密码错误");
+              } else if (status === 404) {
+                this.$message.error("登录接口不存在，请检查后端地址");
+              } else if (status === 500) {
+                this.$message.error("服务器内部错误，请稍后重试");
+              } else {
+                this.$message.error(`请求失败 (${status})`);
+              }
+            } else if (error.code === 'ECONNABORTED') {
+              // 请求超时（axios 默认超时时间 10000ms）
+              this.$message.error("请求超时，请检查网络");
+            } else if (error.message && error.message.includes('Network Error')) {
+              // 网络错误，通常是后端未启动或跨域配置错误
+              this.$message.error("网络异常，请确保后端服务已启动");
+            } else {
+              // 其他未知错误
+              this.$message.error("登录失败，请稍后重试");
+            }
+          } finally {
+            // 无论成功失败，关闭加载状态
+            this.loading = false;
+          }
         }
-
       });
     },
 
+    // 跳转到注册页面
     goToRegister() {
-      this.$router.push('/register')
-    },
-  },
-
-  mounted() {
-    // 如果已登录，直接跳转到首页
-    if (localStorage.getItem("isLoggedIn") === "true") {
-      this.$router.push("/");
+      this.$router.push('/register');
     }
   },
 };

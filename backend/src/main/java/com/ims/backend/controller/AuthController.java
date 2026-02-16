@@ -1,0 +1,67 @@
+package com.ims.backend.controller;
+
+import com.ims.backend.dto.LoginDTO;
+import com.ims.backend.pojo.Result;
+import com.ims.backend.pojo.User;
+import com.ims.backend.service.AuthService;
+import com.ims.backend.utils.JwtUtil;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 用户认证相关的API控制器。
+ * 处理所有与认证（登录、注册等）相关的HTTP请求。
+ */
+@RestController // @Controller 与 @ResponseBody 的组合注解，标记该类所有方法的返回值直接作为 HTTP 响应体
+@RequestMapping("/api/auth") // 定义此控制器下所有请求的基路径
+public class AuthController {
+
+    // 业务逻辑层服务，由Spring容器提供实现类的实例
+    private final AuthService authService;
+
+    // JWT工具类，用于生成和解析令牌
+    private final JwtUtil jwtUtil;
+
+    // 采用构造器注入
+    public AuthController(AuthService authService, JwtUtil jwtUtil) {
+        this.authService = authService;
+        this.jwtUtil = jwtUtil;
+    }
+
+
+    /**
+     * 处理用户登录请求。
+     * 这是一个典型的POST请求处理流程：接收JSON -> 执行业务 -> 返回JSON。
+     *
+     * @param loginDTO 前端发送的登录数据（JSON自动转换而来）
+     * @return 统一格式的响应结果，包含登录状态和数据
+     */
+    @PostMapping("/login") // 映射HTTP POST /api/auth/login 请求到本方法
+    public Result<?> login(@Valid @RequestBody LoginDTO loginDTO) {
+        // 委托Service层进行核心业务逻辑验证（用户名、密码、状态）
+        User user = authService.login(loginDTO);
+        if (user == null) {
+            // 登录失败：返回401状态码和提示信息
+            // 注意：这里模糊提示是为了安全，不明确告知是用户名错误还是密码错误
+            return Result.error(401, "用户名或密码错误，或账户已被禁用");
+        }
+
+        // 登录成功，使用工具类生成JWT令牌（Token）
+        // Token中通常包含用户标识（如ID、用户名）和过期时间
+        String token = jwtUtil.generateToken(user.getUsername(), user.getId());
+
+        // 构建返回给前端的响应数据
+        // 使用Map灵活组装，也可创建专用的响应对象（如LoginVO）
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", user.getId()); // 用户ID
+        data.put("username", user.getUsername()); // 用户名
+        data.put("role", user.getRole()); // 用户角色（权限控制的基础）
+        data.put("token", token); // 身份令牌，前端需在后续请求中携带
+
+        // 步骤4：使用统一成功响应模板返回数据
+        return Result.success(data);
+    }
+}

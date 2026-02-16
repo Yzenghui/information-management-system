@@ -1,12 +1,7 @@
 <template>
   <div id="app">
-    <!-- 登录页面与注册页面独立显示，其他页面显示完整布局 -->
-    <router-view v-if="$route.path === '/login' || $route.path === '/register'" />
-    <div v-else class="main-layout">
-      <!-- 这里后续添加导航栏、侧边栏等公共布局 -->
-      <router-view />
-    </div>
-    
+    <!-- 路由出口：由路由配置决定渲染登录页、注册页或布局页 -->
+    <router-view />
   </div>
 </template>
 
@@ -37,8 +32,4 @@ body {
   min-height: 100vh;
 }
 
-/* 确保布局区域也占满视口 */
-.main-layout {
-  min-height: 100vh;
-}
 </style>

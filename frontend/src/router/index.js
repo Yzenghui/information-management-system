@@ -11,20 +11,23 @@ const routes = [
     name: "login",
     component: UserLogin,
     // meta 字段用于存储路由的额外信息（如权限要求）
-    meta: { requiresAuth: false }, // 不需要登录
+    // guestOnly: true 表示只有未登录的游客才能访问此页面
+    meta: { guestOnly: true }
   },
   {
     path: "/register",
     name: "register",
     component: () => import("../views/Register.vue"),
-    meta: { requiresAuth: false }, // 不需要登录
+    // 注册页同样只有游客才能访问
+    meta: { guestOnly: true }
   },
   {
     path: "/",
     name: "layout",
     // @ 是 webpack 配置的别名，指向 /src
     component: () => import("@/views/Layout.vue"),
-    meta: { requiresAuth: true }, // 需要登录
+    // requiresAuth: true 表示此页面需要登录才能访问
+    meta: { requiresAuth: true },
     // 嵌套路由
     children: [
       {
@@ -57,7 +60,7 @@ const routes = [
   },
 ];
 
-// 创建路由实例创建路由实例
+// 创建路由实例
 const router = new VueRouter({
   mode: "history", // 使用 HTML5 History 模式（URL 没有 #）
   base: process.env.BASE_URL, // 基础路径，通常用于子目录部署
@@ -70,17 +73,20 @@ const router = new VueRouter({
 // from  : 用户来自的路由信息
 // next  : 控制函数，决定是否放行
 router.beforeEach((to, from, next) => {
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-
-  if (to.meta.requiresAuth && !isLoggedIn) {
-    // 需要登录但未登录，跳转到登录页
-    next("/login");
-  } else if ((to.path === "/login" || to.path === "/register") && isLoggedIn) {
-    // 已登录但访问登录页或注册页，跳转到首页
-    next("/");
-  } else {
-    // 正常放行
-    next();
+  // 从 localStorage 获取 token，判断用户是否已登录
+  const token = localStorage.getItem('token')
+  
+  // 需要登录但无 token → 强制跳转到登录页
+  if (to.meta.requiresAuth && !token) {
+    next('/login')
+  } 
+  // 已登录用户访问游客页面（如登录页、注册页）→ 强制跳转到首页
+  else if (to.meta.guestOnly && token) {
+    next('/')
+  } 
+  // 其他情况正常放行
+  else {
+    next()
   }
 });
 
