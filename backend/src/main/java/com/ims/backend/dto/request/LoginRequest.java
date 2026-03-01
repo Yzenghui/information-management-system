@@ -1,4 +1,4 @@
-package com.ims.backend.dto;
+package com.ims.backend.dto.request;
 
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
@@ -6,14 +6,13 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * 登录数据传输对象 (Data Transfer Object)。
  * 专门用于接收前端登录请求的JSON数据。
- *
  * DTO的核心价值：
  * 1. 安全性：只暴露接口必需的字段，防止数据库实体过度暴露。
  * 2. 解耦性：前端请求格式与后端数据库实体结构解耦，独立变化。
  * 3. 验证聚焦：可以针对接口需求定制验证规则，与持久化层的验证分离。
  */
 @Data // Lombok注解：编译时自动生成getter、setter、toString等方法
-public class LoginDTO {
+public class LoginRequest {
 
     /**
      * 用户名。

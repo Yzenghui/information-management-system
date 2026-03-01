@@ -1,6 +1,6 @@
 package com.ims.backend.service.impl;
 
-import com.ims.backend.dto.LoginDTO;
+import com.ims.backend.dto.request.LoginRequest;
 import com.ims.backend.mapper.UserMapper;
 import com.ims.backend.pojo.User;
 import com.ims.backend.service.AuthService;
@@ -31,9 +31,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public User login(LoginDTO loginDTO) {
+    public User login(LoginRequest loginRequest) {
         // 1. 根据用户名查询用户
-        User user = userMapper.findByUsername(loginDTO.getUsername());
+        User user = userMapper.findByUsername(loginRequest.getUsername());
         if (user == null) {
             return null;
         }
@@ -42,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
             return null;
         }
         // 3. 验证密码（使用注入的passwordEncoder）
-        if (passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             user.setPassword(null); // 安全：移除敏感信息
             return user;
         } else {

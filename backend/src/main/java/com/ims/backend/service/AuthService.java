@@ -1,6 +1,6 @@
 package com.ims.backend.service;
 
-import com.ims.backend.dto.LoginDTO;
+import com.ims.backend.dto.request.LoginRequest;
 import com.ims.backend.pojo.User;
 
 /**
@@ -11,8 +11,8 @@ public interface AuthService {
     /**
      * 执行用户登录验证。
      *
-     * @param loginDTO 包含用户名和密码的登录数据传输对象
+     * @param loginRequest 包含用户名和密码的登录数据传输对象
      * @return 登录成功返回用户信息（密码字段已清空），失败返回null
      */
-    User login(LoginDTO loginDTO);
+    User login(LoginRequest loginRequest);
 }
