@@ -1,11 +1,14 @@
 package com.ims.backend.service.impl;
 
 import com.ims.backend.dto.request.LoginRequest;
+import com.ims.backend.dto.request.RegisterRequest;
 import com.ims.backend.mapper.UserMapper;
 import com.ims.backend.pojo.User;
 import com.ims.backend.service.AuthService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 /**
  * 认证服务的具体实现类。
@@ -32,21 +35,56 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User login(LoginRequest loginRequest) {
-        // 1. 根据用户名查询用户
-        User user = userMapper.findByUsername(loginRequest.getUsername());
-        if (user == null) {
-            return null;
-        }
-        // 2. 验证用户状态
-        if (user.getStatus() != null && user.getStatus() != 1) {
-            return null;
-        }
-        // 3. 验证密码（使用注入的passwordEncoder）
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            user.setPassword(null); // 安全：移除敏感信息
-            return user;
-        } else {
-            return null;
+        try {
+            // 1. 根据用户名查询用户
+            User user = userMapper.findByUsername(loginRequest.getUsername());
+            if (user == null) {
+                return null;
+            }
+            // 2. 验证用户状态
+            if (user.getStatus() != null && user.getStatus() != 1) {
+                return null;
+            }
+            // 3. 验证密码（使用注入的passwordEncoder）
+            if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+                user.setPassword(null); // 安全：移除敏感信息
+                return user;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("登录验证过程中发生系统错误：" + e.getMessage());
         }
     }
+
+    @Override
+    public User register(RegisterRequest request) {
+        try {
+            // 1. 检查用户名是否存在
+            User existingUser = userMapper.findByUsername(request.getUsername());
+            if (existingUser != null) {
+                return null;
+            }
+
+            // 2. 创建用户对象
+            User user = new User();
+            user.setUsername(request.getUsername());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setRole("USER");
+            user.setStatus(1);
+            user.setCreateTime(LocalDateTime.now());
+            user.setUpdateTime(LocalDateTime.now());
+
+            // 3. 保存并验证
+            int result = userMapper.insertUser(user);  // ← 返回1表示成功
+            if (result == 1) {
+                user.setPassword(null);
+                return user;  // ← 直接返回我们创建的user对象
+            }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException("注册过程中发生系统错误：" + e.getMessage());
+        }
+    }
+
 }

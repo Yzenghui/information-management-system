@@ -75,7 +75,7 @@ public class Result<T> {
         result.setCode(code);
         result.setMessage(message);
         result.setTimestamp(LocalDateTime.now());
-        // 注意：错误响应不设置data字段，或可设置为更详细的错误对象（在更复杂的设计中）
+        // 错误响应不设置data字段，或可设置为更详细的错误对象
         return result;
     }
 }

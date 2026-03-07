@@ -1,9 +1,7 @@
 package com.ims.backend.mapper;
 
 import com.ims.backend.pojo.User;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 /**
  * 用户数据访问接口（Mapper）。
@@ -25,4 +23,17 @@ public interface UserMapper {
     User findByUsername(@Param("username") String username);
     // 使用 `#{}` 语法是MyBatis的参数占位符，它会被替换为预编译语句(PreparedStatement)中的 `?`，能有效防止SQL注入。
     // @Param 注解明确了方法参数在SQL语句中绑定的名称。在单参数且名字匹配时可选，但显式声明是良好实践。
+
+    /**
+     * 保存新用户到数据库。
+     * 用于用户注册功能，将加密后的用户信息持久化存储。
+     *
+     * @param user 包含用户信息的User对象
+     * @return 受影响的行数，正常情况下应为1
+     */
+    @Insert("INSERT INTO user (username, password, role, status, create_time, update_time) VALUES (#{username}, #{password}, #{role}, #{status}, #{createTime}, #{updateTime})")
+    @Options(useGeneratedKeys = true,    // 启用主键回写功能
+            keyProperty = "id",          // 将生成的主键值赋给对象的 id 属性
+            keyColumn = "id")            // 数据库中的主键列名是 id
+    int insertUser(User user);
 }

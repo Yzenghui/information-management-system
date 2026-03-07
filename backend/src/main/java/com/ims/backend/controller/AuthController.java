@@ -1,7 +1,9 @@
 package com.ims.backend.controller;
 
 import com.ims.backend.dto.request.LoginRequest;
+import com.ims.backend.dto.request.RegisterRequest;
 import com.ims.backend.dto.response.LoginResponse;
+import com.ims.backend.dto.response.RegisterResponse;
 import com.ims.backend.pojo.Result;
 import com.ims.backend.pojo.User;
 import com.ims.backend.service.AuthService;
@@ -60,5 +62,42 @@ public class AuthController {
 
         // 使用统一成功响应模板返回数据
         return Result.success(response);
+    }
+
+    /**
+     * 处理用户注册请求。
+     * 注册成功后自动生成 JWT 令牌，实现"注册即登录"。
+     *
+     * @param registerRequest 前端发送的注册数据（JSON 自动转换而来）
+     * @return 统一格式的响应结果，包含注册状态和用户信息
+     */
+    @PostMapping("/register") // 映射 HTTP POST /api/auth/register 请求到本方法
+    public Result<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        try {
+            // 委托 Service 层执行注册逻辑
+            User user = authService.register(registerRequest);
+
+            // 业务验证失败（用户名已存在、密码不一致等）
+            if (user == null) {
+                return Result.error(400, "用户名已被注册或信息填写有误");
+            }
+
+            // 注册成功，生成 JWT 令牌（类似登录逻辑）
+            String token = jwtUtil.generateToken(user.getUsername(), user.getId());
+
+            // 构建返回给前端的响应数据
+            RegisterResponse response = new RegisterResponse();
+            response.setId(user.getId());
+            response.setUsername(user.getUsername());
+            response.setRole(user.getRole());
+            response.setToken(token);
+
+            // 使用统一成功响应模板返回数据
+            return Result.success(response);
+
+        } catch (RuntimeException e) {
+            // 系统级异常（数据库错误等）
+            return Result.error(500, e.getMessage());
+        }
     }
 }

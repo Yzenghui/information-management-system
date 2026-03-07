@@ -61,9 +61,7 @@
       </el-form>
 
       <div class="login-footer">
-        <el-link type="primary" @click="goToLogin"
-          >已有账号？立即登录</el-link
-        >
+        <el-link type="primary" @click="goToLogin">已有账号？立即登录</el-link>
       </div>
     </el-card>
   </div>
@@ -80,10 +78,10 @@ export default {
         验证通过时，调用 callback()
         验证失败时，调用 callback(new Error('错误提示信息'))，参数是一个 Error 对象 */
     const validateConfirmPassword = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请再次输入密码'));
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
       } else if (value !== this.registerForm.password) {
-        callback(new Error('两次输入密码不一致!'));
+        callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
       }
@@ -94,7 +92,7 @@ export default {
       registerForm: {
         username: "",
         password: "",
-        confirmPassword: ""
+        confirmPassword: "",
       },
       registerRules: {
         username: [
@@ -103,6 +101,11 @@ export default {
             min: 3,
             max: 20,
             message: "用户名长度为 3 到 20 个字符",
+            trigger: "blur",
+          },
+          {
+            pattern: /^[a-zA-Z0-9_]+$/,
+            message: "用户名只能包含字母、数字和下划线",
             trigger: "blur",
           },
         ],
@@ -114,53 +117,72 @@ export default {
             message: "密码长度为 6 到 20 个字符",
             trigger: "blur",
           },
+          {
+            pattern: /^(?=.*[A-Za-z])(?=.*\d).*$/,
+            message: "密码必须包含字母和数字",
+            trigger: "blur",
+          },
         ],
         confirmPassword: [
           { required: true, message: "请确认密码", trigger: "blur" },
-          { validator: validateConfirmPassword, trigger: 'blur' }
+          { validator: validateConfirmPassword, trigger: "blur" },
         ],
       },
     };
   },
   methods: {
-    handleRegister() {
-      this.$refs.registerFormRef.validate((valid) => {
-        if (valid) {
+    async handleRegister(){
+      this.$refs.registerFormRef.validate(async (valid) => {
+        if (valid) { 
           this.loading = true;
+          try {
+            const response = await this.$http.post('/api/auth/register', {
+              username: this.registerForm.username,
+              password: this.registerForm.password,
+            });
+            
+            const result = response.data;
 
-          // 模拟注册API调用
-          setTimeout(() => {
-            this.loading = false;
+            if(result.code==200){
+              localStorage.setItem('token',result.data.token);
+              localStorage.setItem('username',result.data.username);
 
-            // 模拟注册成功
-            if (this.registerForm.username && this.registerForm.password) {
               this.$message.success("注册成功！");
-              
-              // 注册成功后自动登录
-              localStorage.setItem("isLoggedIn", "true");
-              localStorage.setItem("username", this.registerForm.username);
 
-              // 跳转到首页
               this.$router.push("/");
             } else {
-              this.$message.error("注册失败，请重试");
+              this.$message.error(result.message || "注册失败");
             }
-          }, 1500);
-          
+          } catch (error) {
+            console.error("注册请求异常:", error);
+            if (error.response) {
+              const status = error.response.status;
+              if (status === 400) {
+                this.$message.error(error.response.data.message || "用户名已存在或信息填写有误");
+              } else if (status === 404) {
+                this.$message.error("注册接口不存在，请检查后端地址");
+              } else if (status === 500) {
+                this.$message.error("服务器内部错误，请稍后重试");
+              } else {
+                this.$message.error(`请求失败 (${status})`);
+              }
+            } else if (error.code === 'ECONNABORTED') {
+              this.$message.error("请求超时，请检查网络");
+            } else if (error.message && error.message.includes('Network Error')) {
+              this.$message.error("网络异常，请确保后端服务已启动");
+            } else {
+              this.$message.error("注册失败，请稍后重试");
+            }
+          } finally {
+            this.loading = false;
+          }
         }
-      });
+      })
     },
 
     goToLogin() {
       this.$router.push("/login");
     },
-  },
-
-  mounted() {
-    // 如果已登录，直接跳转到首页
-    if (localStorage.getItem("isLoggedIn") === "true") {
-      this.$router.push("/");
-    }
   },
 };
 </script>
