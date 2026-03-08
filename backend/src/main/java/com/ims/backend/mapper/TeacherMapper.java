@@ -2,6 +2,7 @@ package com.ims.backend.mapper;
 
 import com.ims.backend.pojo.Teacher;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
@@ -19,5 +20,14 @@ public interface TeacherMapper {
      */
     @Select("SELECT id, teacher_id, name, gender, subject, address, create_time, update_time FROM teacher")
     List<Teacher> findAll();
+
+    /**
+     * 根据姓名模糊查询教师信息。
+     *
+     * @param name 要查询的姓名（支持模糊匹配，传入部分姓名即可）
+     * @return 符合条件的教师列表，如果未找到则返回空列表
+     */
+    @Select("SELECT id, teacher_id, name, gender, subject, address, create_time, update_time FROM teacher WHERE name LIKE CONCAT('%', #{name}, '%')")
+    List<Teacher> findByName(@Param("name") String name);
 
 }

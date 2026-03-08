@@ -13,7 +13,7 @@ public class Teacher {
     private String teacherId;     // 工号
     private String name;          // 姓名
     private String gender;        // 性别
-    private String major;         // 所授学科
+    private String subject;         // 所授学科
     private String address;      // 籍贯
     private LocalDateTime createTime;   // 创建时间
     private LocalDateTime updateTime;   // 更新时间

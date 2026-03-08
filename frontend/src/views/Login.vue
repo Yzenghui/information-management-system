@@ -149,9 +149,8 @@ export default {
               // 后续每个请求都需要在请求头携带此 token
               localStorage.setItem('token', result.data.token);
               
-              // 存储用户基本信息（不含密码）到 localStorage
-              // JSON.stringify 将对象转换为 JSON 字符串存储
-              localStorage.setItem('user', JSON.stringify(result.data));
+              // 存储用户名到 localStorage
+              localStorage.setItem('username', result.data.username);
 
               // 成功提示：绿色背景，成功图标
               this.$message.success("登录成功！");

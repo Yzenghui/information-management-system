@@ -120,7 +120,7 @@ export default {
   methods: {
     logout() {
       localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem('username');
       this.$router.push("/login");
     },
     // 切换侧边栏折叠状态

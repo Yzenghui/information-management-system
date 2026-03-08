@@ -30,5 +30,14 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    @Override
+    public List<Student> findByName(String name) {
+        try {
+            return studentMapper.findByName(name);
+        } catch (Exception e) {
+            throw new RuntimeException("查询过程中发生系统错误：" + e.getMessage());
+        }
+    }
+
 }
 
