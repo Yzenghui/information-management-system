@@ -5,42 +5,56 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Configuration // 声明这是一个Spring配置类
-@EnableWebSecurity // 启用Spring Security的Web安全功能，并允许自定义配置
+/**
+ * Spring Security 配置类。
+ * 用于定义安全策略和认证规则。
+ */
+@Configuration // 声明这是一个 Spring 配置类
+@EnableWebSecurity // 启用 Spring Security 的 Web 安全功能，并允许自定义配置
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     /**
-     * 定义安全过滤链，这是配置Spring Security规则的核心方法。
+     * 定义安全过滤链，这是配置 Spring Security 规则的核心方法。
      * 它决定了哪些请求需要认证、哪些可以直接访问。
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 配置URL的访问权限规则
+                // 配置 URL 的访问权限规则
                 .authorizeHttpRequests(auth -> auth
-                        // 规则1：登录接口无需认证，允许所有人访问
-                        .requestMatchers("/api/auth/login").permitAll()
-                        // 规则2：目前所有其他请求也无需认证（开发阶段方便测试）
-                        .anyRequest().permitAll()
-                        //正式使用时改为： .anyRequest().authenticated()
+                        // 规则 1：登录、注册接口无需认证，允许所有人访问
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        // 规则 2：其他所有请求都需要认证
+                        .anyRequest().authenticated()
                 )
-                // 关闭CSRF防护，对于使用Token的无状态REST API是标准做法
+                // 关闭 CSRF 防护，对于使用 Token 的无状态 REST API 是标准做法
                 .csrf(AbstractHttpConfigurer::disable)
-                // 禁用HTTP Basic认证，避免浏览器弹出默认登录框
+                // 禁用 HTTP Basic 认证，避免浏览器弹出默认登录框
                 .httpBasic(AbstractHttpConfigurer::disable)
-                // 禁用Spring Security默认的表单登录页面
-                .formLogin(AbstractHttpConfigurer::disable);
+                // 禁用 Spring Security 默认的表单登录页面
+                .formLogin(AbstractHttpConfigurer::disable)
+                // 禁用会话管理，使用无状态的 JWT 认证
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 添加 JWT 过滤器到 UsernamePasswordAuthenticationFilter 之前
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
     /**
-     * 提供BCrypt密码加密器Bean。
-     * 这是引入security依赖的主要目的之一，用于在Service层加密和验证密码。
+     * 提供 BCrypt 密码加密器 Bean。
      */
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -48,16 +62,14 @@ public class SecurityConfig {
     }
 
     /**
-     * 提供一个空的UserDetailsService实现。
-     * 这是一个巧妙的"占位符"，主要目的：
-     * 1. 防止Spring Security自动配置生成随机密码用户。
-     * 2. 因为已禁用默认登录方式(formLogin/httpBasic)，这个服务实际上不会被调用。
+     * 提供一个空的 UserDetailsService 实现。
      */
     @Bean
-    public UserDetailsService userDetailsService() {
+    public org.springframework.security.core.userdetails.UserDetailsService userDetailsService() {
         return username -> {
-            // 永远"找不到用户"，但因为不用默认认证流程，所以这行永远不会执行
-            throw new UsernameNotFoundException("User not found (SecurityConfig placeholder)");
+            throw new org.springframework.security.core.userdetails.UsernameNotFoundException(
+                    "User not found (SecurityConfig placeholder)"
+            );
         };
     }
 }

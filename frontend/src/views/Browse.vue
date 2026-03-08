@@ -56,31 +56,8 @@ export default {
       activeTab: "students",
       loading: false,
       screenWidth: document.documentElement.clientWidth, // 获取屏幕宽度用于响应式
-      studentList: [
-        {
-          id: "2021001",
-          name: "张三",
-          gender: "男",
-          major: "计算机科学",
-          address: "北京"
-        },
-        {
-          id: "2021002", 
-          name: "李四",
-          gender: "女", 
-          major: "软件工程",
-          address: "上海"
-        }
-      ],
-      teacherList: [
-        {
-          id: "T1001",
-          name: "王老师", 
-          gender: "男",
-          subject: "Java程序设计",
-          address: "南京"
-        }
-      ]
+      studentList: [],  // 空数组，等待从后端加载
+      teacherList: []   // 空数组，等待从后端加载
     };
   },
   computed: {
@@ -126,12 +103,46 @@ export default {
       // 切换选项卡时可以重新加载数据
       this.loadData();
     },
-    loadData() {
+    async loadData() {
       this.loading = true;
-      // 模拟数据加载
-      setTimeout(() => {
+      
+      try {
+        if (this.activeTab === 'students') {
+          // 调用学生列表 API
+          const response = await this.$http.get('/api/student');
+          const result = response.data;
+          
+          if (result.code === 200) {
+            this.studentList = result.data;
+          } else {
+            this.$message.error(result.message || '加载失败');
+          }
+        } else {
+          // 调用教师列表 API
+          const response = await this.$http.get('/api/teacher');
+          const result = response.data;
+          
+          if (result.code === 200) {
+            this.teacherList = result.data;
+          } else {
+            // result.message 存在则显示具体错误，否则显示默认文案'加载失败'
+            this.$message.error(result.message || '加载失败');
+          }
+        }
+      } catch (error) {
+        console.error('加载数据失败:', error);
+        
+        if (error.response && error.response.status === 401) {
+          this.$message.error('登录已过期，请重新登录');
+          this.$router.push('/login');
+        } else if (error.message && error.message.includes('Network Error')) {
+          this.$message.error('网络异常，请确保后端服务已启动');
+        } else {
+          this.$message.error('加载失败，请稍后重试');
+        }
+      } finally {
         this.loading = false;
-      }, 500);
+      }
     },
     // 监听窗口大小变化
     handleResize() {

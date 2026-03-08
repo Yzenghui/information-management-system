@@ -10,6 +10,28 @@ Vue.use(ElementUI)
 
 // 设置后端 API 基础地址
 axios.defaults.baseURL = 'http://localhost:8080'
+
+// 添加请求拦截器 - 自动在每个请求中携带 Token
+axios.interceptors.request.use(
+    config => {
+        // 从 localStorage 获取 token
+        const token = localStorage.getItem('token')
+        
+        // 如果有 token，添加到请求头
+        if (token) {
+            // []：访问对象属性的另一种方式（等价于 .Authorization）
+            // ``：模板字符串，${} 自动插入变量值（等价于 'Bearer ' + token）
+            config.headers['Authorization'] = `Bearer ${token}`
+        }
+        
+        return config
+    },
+    error => {
+        // 拦截器出错时，阻止请求发送
+        return Promise.reject(error)
+    }
+)
+
 // 将 axios 挂载到 Vue 原型链，组件内通过 this.$http 调用
 Vue.prototype.$http = axios
 

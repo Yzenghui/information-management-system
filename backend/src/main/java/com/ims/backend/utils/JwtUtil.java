@@ -55,6 +55,51 @@ public class JwtUtil {
                 .compact(); // 生成最终的、经过Base64Url编码的JWT字符串
     }
 
-    // 注意：此处省略了验证令牌(validateToken)、解析用户ID(getUserIdFromToken)等方法。
-    // 这些方法将在实现鉴权拦截器(JwtAuthenticationFilter)时补充。
+    /**
+     * 从 Token 中解析用户名。
+     *
+     * @param token JWT 令牌
+     * @return 用户名
+     */
+    public String getUsernameFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(SECRET_KEY)          // 使用密钥验证签名
+                .build()                         // 构建解析器实例
+                .parseSignedClaims(token)        // 解析并验证JWT的签名和结构
+                .getPayload()                    // 获取JWT的有效载荷（Payload）
+                .getSubject();                   // 提取主题（通常是用户名）
+    }
+
+    /**
+     * 从 Token 中解析用户 ID。
+     *
+     * @param token JWT 令牌
+     * @return 用户 ID
+     */
+    public Integer getUserIdFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(SECRET_KEY)          // 使用密钥验证签名
+                .build()                         // 构建解析器实例
+                .parseSignedClaims(token)        // 解析并验证JWT的签名和结构
+                .getPayload()                    // 获取JWT的有效载荷（Payload）
+                .get("userId", Integer.class);   // 从自定义声明中提取用户ID，并转换为Integer类型
+    }
+
+    /**
+     * 验证 Token 是否有效。
+     *
+     * @param token JWT 令牌
+     * @return true 表示有效，false 表示无效或过期
+     */
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(SECRET_KEY)      // 使用密钥验证签名
+                    .build()                     // 构建解析器实例
+                    .parseSignedClaims(token);   // 解析并验证JWT（包括签名、过期时间等）
+            return true;                         // 无异常则表示令牌有效
+        } catch (Exception e) {
+            return false;                        // 捕获任何异常（如签名错误、过期、格式非法等）视为无效
+        }
+    }
 }
