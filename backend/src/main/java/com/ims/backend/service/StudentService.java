@@ -24,4 +24,12 @@ public interface StudentService {
      */
     List<Student> findByName(String name);
 
+    /**
+     * 添加学生信息。
+     *
+     * @param student 学生对象，包含待插入的学生信息
+     * @return true 表示添加成功，false 表示添加失败
+     */
+    boolean add(Student student);
+
 }

@@ -1,9 +1,8 @@
 package com.ims.backend.mapper;
 
 import com.ims.backend.pojo.Teacher;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
+
 import java.util.List;
 
 /**
@@ -29,5 +28,15 @@ public interface TeacherMapper {
      */
     @Select("SELECT id, teacher_id, name, gender, subject, address, create_time, update_time FROM teacher WHERE name LIKE CONCAT('%', #{name}, '%')")
     List<Teacher> findByName(@Param("name") String name);
+
+    /**
+     * 插入新教师记录到数据库。
+     *
+     * @param teacher 教师对象，包含待插入的教师信息
+     * @return 受影响的行数，正常情况下应为 1
+     */
+    @Insert("INSERT INTO teacher (teacher_id, name, gender, subject, address, create_time, update_time) VALUES (#{teacherId}, #{name}, #{gender}, #{subject}, #{address}, #{createTime}, #{updateTime})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    int insert(Teacher teacher);
 
 }

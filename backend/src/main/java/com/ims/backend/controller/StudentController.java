@@ -43,4 +43,32 @@ public class StudentController {
             return Result.error(500, e.getMessage());
         }
     }
+
+    /**
+     * 添加新学生信息。
+     *
+     * @param student 包含学生信息的请求体数据
+     * @return 统一格式的响应结果
+     */
+    @PostMapping
+    public Result<?> add(@RequestBody Student student) {
+        try {
+            if (student.getStudentId() == null || student.getStudentId().trim().isEmpty()) {
+                return Result.error(400, "学号不能为空");
+            }
+            if (student.getName() == null || student.getName().trim().isEmpty()) {
+                return Result.error(400, "姓名不能为空");
+            }
+
+            boolean addResult = studentService.add(student);
+
+            if (addResult) {
+                return Result.success();
+            } else {
+                return Result.error(500, "添加失败");
+            }
+        } catch (RuntimeException e) {
+            return Result.error(500, e.getMessage());
+        }
+    }
 }

@@ -24,5 +24,13 @@ public interface TeacherService {
      * @param name 教师姓名
      * @return 统一格式的响应结果，包含查询到的教师列表数据
      */
-    List findByName(String name);
+    List<Teacher> findByName(String name);
+
+    /**
+     * 添加教师信息。
+     *
+     * @param teacher 教师对象，包含待插入的教师信息
+     * @return true 表示添加成功，false 表示添加失败
+     */
+    boolean add(Teacher teacher);
 }

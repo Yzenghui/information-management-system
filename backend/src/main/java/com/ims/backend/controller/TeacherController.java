@@ -43,4 +43,35 @@ public class TeacherController {
             return Result.error(500, e.getMessage());
         }
     }
+
+    /**
+     * 添加新教师信息。
+     *
+     * @param teacher 包含教师信息的请求体数据
+     * @return 统一格式的响应结果
+     */
+    @PostMapping
+    public Result<?> add(@RequestBody Teacher teacher){
+        try {
+            // 1. 参数校验
+            if (teacher.getTeacherId() == null || teacher.getTeacherId().trim().isEmpty()) {
+                return Result.error(400, "工号不能为空");
+            }
+            if (teacher.getName() == null || teacher.getName().trim().isEmpty()) {
+                return Result.error(400, "姓名不能为空");
+            }
+
+            // 2. 调用 Service 层
+            boolean addResult = teacherService.add(teacher);
+
+            // 3. 返回结果
+            if (addResult) {
+                return Result.success();
+            } else {
+                return Result.error(500, "添加失败");
+            }
+        } catch (RuntimeException e) {
+            return Result.error(500, e.getMessage());
+        }
+    }
 }

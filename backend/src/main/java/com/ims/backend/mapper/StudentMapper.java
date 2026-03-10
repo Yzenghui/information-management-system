@@ -1,9 +1,8 @@
 package com.ims.backend.mapper;
 
 import com.ims.backend.pojo.Student;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
+
 import java.util.List;
 
 /**
@@ -31,4 +30,14 @@ public interface StudentMapper {
     @Select("SELECT id, student_id, name, gender, major, address, create_time, update_time FROM student WHERE name LIKE CONCAT('%', #{name}, '%')")
     List<Student> findByName(@Param("name") String name);
     // CONCAT(...): SQL 函数，用于将多个字符串连接成一个字符串
+
+    /**
+     * 插入新学生记录到数据库。
+     *
+     * @param student 学生对象，包含待插入的学生信息
+     * @return 受影响的行数，正常情况下应为 1
+     */
+    @Insert("INSERT INTO student (student_id, name, gender, major, address, create_time, update_time) VALUES (#{studentId}, #{name}, #{gender}, #{major}, #{address}, #{createTime}, #{updateTime})")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+    int insert(Student student);
 }

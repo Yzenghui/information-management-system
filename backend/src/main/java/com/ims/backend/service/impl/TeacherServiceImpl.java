@@ -6,6 +6,7 @@ import com.ims.backend.pojo.Teacher;
 import com.ims.backend.service.TeacherService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -37,6 +38,28 @@ public class TeacherServiceImpl implements TeacherService {
             return teacherMapper.findByName(name);
         } catch (Exception e) {
             throw new RuntimeException("查询过程中发生系统错误：" + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean add(Teacher teacher) {
+        try {
+            // 1. 验证工号是否已存在
+            List<Teacher> all = teacherMapper.findAll();
+            for (Teacher t : all) {
+                if (t.getTeacherId().equals(teacher.getTeacherId())) {
+                    throw new RuntimeException("工号已存在");
+                }
+            }
+
+            // 2. 设置时间
+            teacher.setCreateTime(LocalDateTime.now());
+            teacher.setUpdateTime(LocalDateTime.now());
+
+            // 3. 插入数据库
+            return teacherMapper.insert(teacher) == 1;
+        } catch (Exception e) {
+            throw new RuntimeException("添加过程中发生错误：" + e.getMessage());
         }
     }
 }
