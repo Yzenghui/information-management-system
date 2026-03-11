@@ -1,15 +1,19 @@
 <template>
   <div class="profile-page">
     <h2>个人信息</h2>
-    
+
     <el-card class="profile-card">
       <!-- 基本信息 -->
-      <el-form :model="profileForm" :label-position="labelPosition" label-width="100px">
+      <el-form
+        :model="profileForm"
+        :label-position="labelPosition"
+        label-width="100px"
+      >
         <el-form-item label="用户名">
-            <!-- disabled 作用是禁用输入框 -->
+          <!-- disabled 作用是禁用输入框 -->
           <el-input v-model="profileForm.username" disabled></el-input>
         </el-form-item>
-        
+
         <el-form-item label="注册时间">
           <el-input v-model="profileForm.registerTime" disabled></el-input>
         </el-form-item>
@@ -23,24 +27,44 @@
       <div slot="header">
         <span>修改密码</span>
       </div>
-      
-      <el-form :model="passwordForm" :rules="passwordRules" :label-position="labelPosition" ref="passwordFormRef" label-width="100px">
+
+      <el-form
+        :model="passwordForm"
+        :rules="passwordRules"
+        :label-position="labelPosition"
+        ref="passwordFormRef"
+        label-width="100px"
+      >
         <el-form-item label="原密码" prop="oldPassword">
           <!-- show-password 是显示密码可见性切换按钮 -->
-          <el-input v-model="passwordForm.oldPassword" type="password" show-password></el-input>
+          <el-input
+            v-model="passwordForm.oldPassword"
+            type="password"
+            show-password
+          ></el-input>
         </el-form-item>
-        
+
         <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="passwordForm.newPassword" type="password" show-password></el-input>
+          <el-input
+            v-model="passwordForm.newPassword"
+            type="password"
+            show-password
+          ></el-input>
         </el-form-item>
-        
+
         <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input v-model="passwordForm.confirmPassword" type="password" show-password></el-input>
+          <el-input
+            v-model="passwordForm.confirmPassword"
+            type="password"
+            show-password
+          ></el-input>
         </el-form-item>
-        
+
         <el-form-item>
           <!-- 在此处，按钮对齐的是上面的标签 -->
-          <el-button type="primary" @click="handleChangePassword">修改密码</el-button>
+          <el-button type="primary" @click="handleChangePassword"
+            >修改密码</el-button
+          >
           <el-button @click="handleResetPassword">重置</el-button>
         </el-form-item>
       </el-form>
@@ -55,7 +79,7 @@ export default {
     // 输入框值变化并触发验证时，会自动把当前值作为 value 参数传递进来
     const validateConfirmPassword = (rule, value, callback) => {
       if (value !== this.passwordForm.newPassword) {
-        callback(new Error('两次输入密码不一致'));
+        callback(new Error("两次输入密码不一致"));
       } else {
         callback();
       }
@@ -65,41 +89,98 @@ export default {
       screenWidth: document.documentElement.clientWidth, // 添加屏幕宽度监听
       profileForm: {
         username: localStorage.getItem("username") || "用户",
-        registerTime: "2024-01-01" // 模拟数据
+        registerTime: "加载中...",
       },
       passwordForm: {
         oldPassword: "",
         newPassword: "",
-        confirmPassword: ""
+        confirmPassword: "",
       },
       passwordRules: {
         oldPassword: [
-          { required: true, message: "请输入原密码", trigger: "blur" }
+          { required: true, message: "请输入原密码", trigger: "blur" },
         ],
         newPassword: [
           { required: true, message: "请输入新密码", trigger: "blur" },
-          { min: 6, max: 20, message: "密码长度 6-20 个字符", trigger: "blur" }
+          {
+            min: 6,
+            max: 20,
+            message: "密码长度为 6 到 20 个字符",
+            trigger: "blur",
+          },
+          {
+            pattern: /^(?=.*[A-Za-z])(?=.*\d).*$/,
+            message: "密码必须包含字母和数字",
+            trigger: "blur",
+          },
         ],
         confirmPassword: [
           { required: true, message: "请确认密码", trigger: "blur" },
-          { validator: validateConfirmPassword, trigger: "blur" }
-        ]
-      }
+          { validator: validateConfirmPassword, trigger: "blur" },
+        ],
+      },
     };
   },
   computed: {
     // 根据屏幕宽度动态调整标签位置
     labelPosition() {
-      return this.screenWidth < 768 ? 'top' : 'right';
-    }
+      return this.screenWidth < 768 ? "top" : "right";
+    },
   },
   methods: {
-    handleChangePassword() {
-      this.$refs.passwordFormRef.validate((valid) => {
+    async loadUserProfile() {
+      try {
+        const response = await this.$http.get("/api/user/profile");
+        const result = response.data;
+
+        if (result.code === 200) {
+          this.profileForm.username = result.data.username;
+          this.profileForm.registerTime = result.data.registerTime;
+        } else {
+          this.$message.error(result.message || "获取用户信息失败");
+        }
+      } catch (error) {
+        console.error("获取用户信息异常:", error);
+        this.$message.error(
+          error.response?.data?.message || "网络异常，请稍后重试"
+        );
+      }
+    },
+
+    async handleChangePassword() {
+      this.$refs.passwordFormRef.validate(async (valid) => {
         if (valid) {
-          // 模拟修改密码
-          this.$message.success("密码修改成功！");
-          this.handleResetPassword();
+          try {
+            const response = await this.$http.put("/api/user/password", {
+              oldPassword: this.passwordForm.oldPassword,
+              newPassword: this.passwordForm.newPassword,
+              confirmPassword: this.passwordForm.confirmPassword,
+            });
+
+            const result = response.data;
+
+            if (result.code === 200) {
+              this.$message.success("密码修改成功！");
+              this.handleResetPassword();
+            } else {
+              this.$message.error(result.message || "密码修改失败");
+            }
+          } catch (error) {
+            console.error("修改密码失败:", error);
+
+            const msg =
+              error.response?.data?.message ||
+              (error.message?.includes("Network Error")
+                ? "网络异常，请确保后端服务已启动"
+                : "密码修改失败，请稍后重试");
+
+            if (error.response?.status === 401) {
+              this.$message.error("登录已过期，请重新登录");
+              this.$router.push("/login");
+            } else {
+              this.$message.error(msg);
+            }
+          }
         }
       });
     },
@@ -109,16 +190,19 @@ export default {
     // 监听窗口大小变化
     handleResize() {
       this.screenWidth = document.documentElement.clientWidth;
-    }
+    },
   },
   mounted() {
     // 添加窗口大小变化监听
-    window.addEventListener('resize', this.handleResize);
+    window.addEventListener("resize", this.handleResize);
+
+    // 加载用户信息
+    this.loadUserProfile();
   },
   beforeDestroy() {
     // 移除监听器，防止内存泄漏
-    window.removeEventListener('resize', this.handleResize);
-  }
+    window.removeEventListener("resize", this.handleResize);
+  },
 };
 </script>
 

@@ -19,10 +19,20 @@ public interface UserMapper {
      * @return 查询到的用户对象。如果数据库中不存在该用户，则返回 {@code null}。
      *         注意：返回的User对象包含数据库中所有选中字段的值，包括加密后的密码。
      */
-    @Select("SELECT id, username, password, role, status FROM user WHERE username = #{username}")
+    @Select("SELECT id, username, password, role, status, create_time, update_time FROM user WHERE username = #{username}")
     User findByUsername(@Param("username") String username);
     // 使用 `#{}` 语法是MyBatis的参数占位符，它会被替换为预编译语句(PreparedStatement)中的 `?`，能有效防止SQL注入。
     // @Param 注解明确了方法参数在SQL语句中绑定的名称。在单参数且名字匹配时可选，但显式声明是良好实践。
+
+    /**
+     * 根据用户 ID 查询用户信息。
+     *
+     * @param userId 用户 ID
+     * @return 用户对象，包含注册时间等信息
+     */
+    @Select("SELECT id, username, password, role, status, create_time, update_time FROM user WHERE id = #{id}")
+    User findById(@Param("id") Integer userId);
+
 
     /**
      * 保存新用户到数据库。
@@ -36,4 +46,13 @@ public interface UserMapper {
             keyProperty = "id",          // 将生成的主键值赋给对象的 id 属性
             keyColumn = "id")            // 数据库中的主键列名是 id
     int insertUser(User user);
+
+    /**
+     * 更新用户密码。
+     *
+     * @param user 用户对象，包含新的密码
+     * @return 受影响的行数
+     */
+    @Update("UPDATE user SET password = #{password}, update_time = #{updateTime} WHERE id = #{id}")
+    int updateUser(User user);
 }
