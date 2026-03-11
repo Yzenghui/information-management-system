@@ -32,4 +32,12 @@ public interface StudentService {
      */
     boolean add(Student student);
 
+    /**
+     * 根据学号删除学生信息。
+     *
+     * @param studentId 学号
+     * @return true 表示删除成功，false 表示删除失败（未找到记录）
+     */
+    boolean deleteByStudentId(String studentId);
+
 }

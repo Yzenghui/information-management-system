@@ -74,4 +74,27 @@ public class TeacherController {
             return Result.error(500, e.getMessage());
         }
     }
+
+    /**
+     * 根据工号删除教师信息。
+     *
+     * @param teacherId 工号
+     * @return 统一格式的响应结果
+     */
+    @DeleteMapping("/{teacherId}")
+    public Result<?> delete(@PathVariable String teacherId) {
+        try {
+            if (teacherId == null || teacherId.trim().isEmpty()) {
+                return Result.error(400, "工号不能为空");
+            }
+            boolean success = teacherService.deleteByTeacherId(teacherId);
+            if (success) {
+                return Result.success();
+            } else {
+                return Result.error(500, "删除失败，未找到该记录");
+            }
+        } catch (RuntimeException e) {
+            return Result.error(500, e.getMessage());
+        }
+    }
 }

@@ -40,4 +40,14 @@ public interface StudentMapper {
     @Insert("INSERT INTO student (student_id, name, gender, major, address, create_time, update_time) VALUES (#{studentId}, #{name}, #{gender}, #{major}, #{address}, #{createTime}, #{updateTime})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     int insert(Student student);
+
+    /**
+     * 根据学号删除学生记录。
+     *
+     * @param studentId 学号
+     * @return 受影响的行数，正常情况下应为 1
+     */
+    @Delete("DELETE FROM student WHERE student_id = #{studentId}")
+    int deleteByStudentId(@Param("studentId") String studentId);
+
 }

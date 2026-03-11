@@ -15,7 +15,7 @@
           v-loading="loading"
           :size="tableSize"
         >
-          <el-table-column prop="id" label="学号" :width="columnWidths.id"></el-table-column>
+         <el-table-column prop="studentId" label="学号" :width="columnWidths.id"></el-table-column>
           <el-table-column prop="name" label="姓名" :width="columnWidths.name"></el-table-column>
           <el-table-column prop="gender" label="性别" :width="columnWidths.gender"></el-table-column>
           <el-table-column prop="major" label="专业" :width="columnWidths.major"></el-table-column>
@@ -33,7 +33,7 @@
           v-loading="loading"
           :size="tableSize"
         >
-          <el-table-column prop="id" label="工号" :width="columnWidths.id"></el-table-column>
+         <el-table-column prop="teacherId" label="工号" :width="columnWidths.id"></el-table-column>
           <el-table-column prop="name" label="姓名" :width="columnWidths.name"></el-table-column>
           <el-table-column prop="gender" label="性别" :width="columnWidths.gender"></el-table-column>
           <el-table-column prop="subject" label="所授学科" :width="columnWidths.major"></el-table-column>

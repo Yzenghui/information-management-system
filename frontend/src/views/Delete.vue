@@ -109,15 +109,48 @@ export default {
         }
       });
     },
-    confirmDelete() {
+    async confirmDelete() {
       this.loading = true;
-      // 模拟删除操作
-      setTimeout(() => {
-        this.loading = false;
+
+      try {
+        // 根据类型构建不同的 API 路径
+        const url =
+          this.deleteForm.type === "student"
+            ? `/api/student/${this.deleteForm.id}`
+            : `/api/teacher/${this.deleteForm.id}`;
+
+        // 调用后端删除 API（RESTful 风格）
+        const response = await this.$http.delete(url);
+
+        const result = response.data;
+        // 处理响应
+        if (result.code === 200) {
+          // 删除成功
+          this.$message.success("删除成功！");
+          this.handleReset();
+        } else {
+          // 业务错误（如未找到记录）
+          this.$message.error(result.message || "删除失败");
+        }
+      } catch (error) {
+        console.error("删除请求异常:", error);
+
+        const msg =
+          error.response?.data?.message ||
+          (error.message?.includes("Network Error")
+            ? "网络异常，请确保后端服务已启动"
+            : "删除失败，请稍后重试");
+
+        if (error.response?.status === 401) {
+          this.$message.error("登录已过期，请重新登录");
+          this.$router.push("/login");
+        } else {
+          this.$message.error(msg);
+        }
+      } finally {
         this.confirmVisible = false;
-        this.$message.success("删除成功！");
-        this.handleReset();
-      }, 1000);
+        this.loading = false;
+      }
     },
     handleReset() {
       /* 清空所有表单字段的值，清除验证状态和错误提示，将表单恢复到初始状态 */

@@ -60,6 +60,14 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("添加过程中发生错误：" + e.getMessage());
         }
     }
+    @Override
+    public boolean deleteByStudentId(String studentId) {
+        try {
+            return studentMapper.deleteByStudentId(studentId) == 1;
+        } catch (Exception e) {
+            throw new RuntimeException("删除过程中发生系统错误：" + e.getMessage());
+        }
+    }
 
 
 }

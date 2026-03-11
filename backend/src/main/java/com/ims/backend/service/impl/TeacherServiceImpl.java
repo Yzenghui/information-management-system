@@ -62,4 +62,13 @@ public class TeacherServiceImpl implements TeacherService {
             throw new RuntimeException("添加过程中发生错误：" + e.getMessage());
         }
     }
+
+    @Override
+    public boolean deleteByTeacherId(String teacherId) {
+        try {
+            return teacherMapper.deleteByTeacherId(teacherId) == 1;
+        } catch (Exception e) {
+            throw new RuntimeException("删除过程中发生系统错误：" + e.getMessage());
+        }
+    }
 }

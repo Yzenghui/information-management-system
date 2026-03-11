@@ -39,4 +39,13 @@ public interface TeacherMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     int insert(Teacher teacher);
 
+    /**
+     * 根据工号删除教师记录。
+     *
+     * @param teacherId 工号
+     * @return 受影响的行数，正常情况下应为 1
+     */
+    @Delete("DELETE FROM teacher WHERE teacher_id = #{teacherId}")
+    int deleteByTeacherId(@Param("teacherId") String teacherId);
+
 }

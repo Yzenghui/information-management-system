@@ -33,4 +33,13 @@ public interface TeacherService {
      * @return true 表示添加成功，false 表示添加失败
      */
     boolean add(Teacher teacher);
+
+    /**
+     * 根据工号删除教师信息。
+     *
+     * @param teacherId 工号
+     * @return true 表示删除成功，false 表示删除失败（未找到记录）
+     */
+    boolean deleteByTeacherId(String teacherId);
+
 }

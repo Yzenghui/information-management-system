@@ -71,4 +71,27 @@ public class StudentController {
             return Result.error(500, e.getMessage());
         }
     }
+
+    /**
+     * 根据学号删除学生信息。
+     *
+     * @param studentId 学号
+     * @return 统一格式的响应结果
+     */
+    @DeleteMapping("/{studentId}")
+    public Result<?> delete(@PathVariable String studentId) {
+        try {
+            if (studentId == null || studentId.trim().isEmpty()) {
+                return Result.error(400, "学号不能为空");
+            }
+            boolean success = studentService.deleteByStudentId(studentId);
+            if (success) {
+                return Result.success();
+            } else {
+                return Result.error(500, "删除失败，未找到该记录");
+            }
+        } catch (RuntimeException e) {
+            return Result.error(500, e.getMessage());
+        }
+    }
 }
