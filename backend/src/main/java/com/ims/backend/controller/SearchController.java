@@ -6,6 +6,8 @@ import com.ims.backend.pojo.Student;
 import com.ims.backend.pojo.Teacher;
 import com.ims.backend.service.StudentService;
 import com.ims.backend.service.TeacherService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -35,43 +37,46 @@ public class SearchController {
      */
     @GetMapping
     public Result<?> search(@RequestParam String name) {
-        try {
-            // 1. 同时查询学生和教师
-            List<Student> students = studentService.findByName(name);
-            List<Teacher> teachers = teacherService.findByName(name);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String role = authentication.getAuthorities().stream()
+                .findFirst()
+                .map(auth -> auth.getAuthority())
+                .orElse("");
 
-            // 2. 转换为统一格式
-            List<SearchResponse> results = new ArrayList<>();
+        List<Student> students;
+        List<Teacher> teachers = new ArrayList<>();
 
-            // 转换学生数据
-            for (Student student : students) {
-                SearchResponse response = new SearchResponse();
-                response.setId(student.getStudentId());  // 学号
-                response.setName(student.getName());
-                response.setGender(student.getGender());
-                response.setProfession("学生");
-                response.setCourse(student.getMajor());  // 专业
-                response.setAddress(student.getAddress());
-                results.add(response);
-            }
-
-            // 转换教师数据
-            for (Teacher teacher : teachers) {
-                SearchResponse response = new SearchResponse();
-                response.setId(teacher.getTeacherId());  // 工号
-                response.setName(teacher.getName());
-                response.setGender(teacher.getGender());
-                response.setProfession("教师");
-                response.setCourse(teacher.getSubject());  // 学科
-                response.setAddress(teacher.getAddress());
-                results.add(response);
-            }
-
-            // 3. 返回结果
-            return Result.success(results);
-
-        } catch (RuntimeException e) {
-            return Result.error(500, "搜索失败：" + e.getMessage());
+        if ("ROLE_STUDENT".equals(role)) {
+            students = studentService.findByName(name);
+        } else {
+            students = studentService.findByName(name);
+            teachers = teacherService.findByName(name);
         }
+
+        List<SearchResponse> results = new ArrayList<>();
+
+        for (Student student : students) {
+            SearchResponse response = new SearchResponse();
+            response.setId(student.getStudentId());
+            response.setName(student.getName());
+            response.setGender(student.getGender());
+            response.setProfession("学生");
+            response.setCourse(student.getMajor());
+            response.setAddress(student.getAddress());
+            results.add(response);
+        }
+
+        for (Teacher teacher : teachers) {
+            SearchResponse response = new SearchResponse();
+            response.setId(teacher.getTeacherId());
+            response.setName(teacher.getName());
+            response.setGender(teacher.getGender());
+            response.setProfession("教师");
+            response.setCourse(teacher.getSubject());
+            response.setAddress(teacher.getAddress());
+            results.add(response);
+        }
+
+        return Result.success(results);
     }
 }

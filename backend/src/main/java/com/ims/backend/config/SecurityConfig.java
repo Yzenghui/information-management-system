@@ -2,6 +2,7 @@ package com.ims.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -37,16 +38,25 @@ public class SecurityConfig {
 
                         // 管理员专属接口
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/**").hasRole("ADMIN")
 
-                        // 教师和管理员可访问
-                        .requestMatchers("/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")
+                        // 教师信息管理：按操作类型区分权限
+                        .requestMatchers(HttpMethod.GET, "/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")  // 查看：教师和管理员
+                        .requestMatchers(HttpMethod.POST, "/api/teacher/**").hasRole("ADMIN")  // 添加：仅管理员
+                        .requestMatchers(HttpMethod.DELETE, "/api/teacher/**").hasRole("ADMIN")  // 删除：仅管理员
 
-                        // 学生、教师、管理员都可访问
-                        .requestMatchers("/api/student/**").hasAnyRole("STUDENT","TEACHER", "ADMIN")
-                        .requestMatchers("/api/user/**").authenticated()
+                        // 学生信息管理：也按操作类型区分
+                        .requestMatchers(HttpMethod.GET, "/api/student/**").hasAnyRole("STUDENT", "TEACHER", "ADMIN")  // 查看：所有人
+                        .requestMatchers(HttpMethod.POST, "/api/student/**").hasRole("ADMIN")  // 添加：仅管理员
+                        .requestMatchers(HttpMethod.DELETE, "/api/student/**").hasRole("ADMIN")  // 删除：仅管理员
+
+
+                        // 搜索接口：所有登录用户都可访问（但数据会按角色过滤）
+                        .requestMatchers("/api/search/**").authenticated()
 
                         // 其他所有请求需要认证
                         .anyRequest().authenticated()
+
                 )
                 // 关闭 CSRF 防护，对于使用 Token 的无状态 REST API 是标准做法
                 .csrf(AbstractHttpConfigurer::disable)

@@ -52,23 +52,19 @@ public class StudentController {
      */
     @PostMapping
     public Result<?> add(@RequestBody Student student) {
-        try {
-            if (student.getStudentId() == null || student.getStudentId().trim().isEmpty()) {
-                return Result.error(400, "学号不能为空");
-            }
-            if (student.getName() == null || student.getName().trim().isEmpty()) {
-                return Result.error(400, "姓名不能为空");
-            }
+        if (student.getStudentId() == null || student.getStudentId().trim().isEmpty()) {
+            return Result.error(400, "学号不能为空");
+        }
+        if (student.getName() == null || student.getName().trim().isEmpty()) {
+            return Result.error(400, "姓名不能为空");
+        }
 
-            boolean addResult = studentService.add(student);
+        boolean addResult = studentService.add(student);
 
-            if (addResult) {
-                return Result.success();
-            } else {
-                return Result.error(500, "添加失败");
-            }
-        } catch (RuntimeException e) {
-            return Result.error(500, e.getMessage());
+        if (addResult) {
+            return Result.success();
+        } else {
+            return Result.error(500, "添加失败");
         }
     }
 
@@ -80,18 +76,14 @@ public class StudentController {
      */
     @DeleteMapping("/{studentId}")
     public Result<?> delete(@PathVariable String studentId) {
-        try {
-            if (studentId == null || studentId.trim().isEmpty()) {
-                return Result.error(400, "学号不能为空");
-            }
-            boolean success = studentService.deleteByStudentId(studentId);
-            if (success) {
-                return Result.success();
-            } else {
-                return Result.error(500, "删除失败，未找到该记录");
-            }
-        } catch (RuntimeException e) {
-            return Result.error(500, e.getMessage());
+        if (studentId == null || studentId.trim().isEmpty()) {
+            return Result.error(400, "学号不能为空");
+        }
+        boolean success = studentService.deleteByStudentId(studentId);
+        if (success) {
+            return Result.success();
+        } else {
+            return Result.error(500, "删除失败，未找到该记录");
         }
     }
 }

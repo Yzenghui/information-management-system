@@ -135,7 +135,9 @@ export default {
         if (error.response && error.response.status === 401) {
           this.$message.error('登录已过期，请重新登录');
           this.$router.push('/login');
-        } else if (error.message && error.message.includes('Network Error')) {
+        }else if (error.response && error.response.status === 403) {
+          this.$message.error(error.response.data?.message || '权限不足，无法访问');
+        }else if (error.message && error.message.includes('Network Error')) {
           this.$message.error('网络异常，请确保后端服务已启动');
         } else {
           this.$message.error('加载失败，请稍后重试');

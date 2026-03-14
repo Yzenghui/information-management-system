@@ -73,31 +73,25 @@ public class AuthController {
      */
     @PostMapping("/register") // 映射 HTTP POST /api/auth/register 请求到本方法
     public Result<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        try {
-            // 委托 Service 层执行注册逻辑
-            User user = authService.register(registerRequest);
+        // 委托 Service 层执行注册逻辑
+        User user = authService.register(registerRequest);
 
-            // 业务验证失败（用户名已存在、密码不一致等）
-            if (user == null) {
-                return Result.error(400, "用户名已被注册或信息填写有误");
-            }
-
-            // 注册成功，生成 JWT 令牌（类似登录逻辑）
-            String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getRole());
-
-            // 构建返回给前端的响应数据
-            RegisterResponse response = new RegisterResponse();
-            response.setId(user.getId());
-            response.setUsername(user.getUsername());
-            response.setRole(user.getRole());
-            response.setToken(token);
-
-            // 使用统一成功响应模板返回数据
-            return Result.success(response);
-
-        } catch (RuntimeException e) {
-            // 系统级异常（数据库错误等）
-            return Result.error(500, e.getMessage());
+        // 业务验证失败（用户名已存在、密码不一致等）
+        if (user == null) {
+            return Result.error(400, "用户名已被注册或信息填写有误");
         }
+
+        // 注册成功，生成 JWT 令牌（类似登录逻辑）
+        String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getRole());
+
+        // 构建返回给前端的响应数据
+        RegisterResponse response = new RegisterResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setRole(user.getRole());
+        response.setToken(token);
+
+        // 使用统一成功响应模板返回数据
+        return Result.success(response);
     }
 }
