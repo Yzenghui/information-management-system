@@ -51,7 +51,7 @@ public class AuthController {
 
         // 登录成功，使用工具类生成JWT令牌（Token）
         // Token中通常包含用户标识（如ID、用户名）和过期时间
-        String token = jwtUtil.generateToken(user.getUsername(), user.getId());
+        String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getRole());
 
         // 构建返回给前端的响应数据
         LoginResponse response = new LoginResponse();
@@ -83,7 +83,7 @@ public class AuthController {
             }
 
             // 注册成功，生成 JWT 令牌（类似登录逻辑）
-            String token = jwtUtil.generateToken(user.getUsername(), user.getId());
+            String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getRole());
 
             // 构建返回给前端的响应数据
             RegisterResponse response = new RegisterResponse();

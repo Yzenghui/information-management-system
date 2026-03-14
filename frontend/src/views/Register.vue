@@ -7,6 +7,12 @@
         <p>欢迎注册，请填写您的账号信息</p>
       </div>
 
+      <!-- 角色选择标签页 -->
+      <el-tabs v-model="registerType" class="register-tabs">
+        <el-tab-pane label="学生注册" name="STUDENT"></el-tab-pane>
+        <el-tab-pane label="教师注册" name="TEACHER"></el-tab-pane>
+      </el-tabs>
+
       <el-form
         :model="registerForm"
         :rules="registerRules"
@@ -89,6 +95,7 @@ export default {
 
     return {
       loading: false,
+      registerType: "STUDENT", // 注册类型
       registerForm: {
         username: "",
         password: "",
@@ -139,6 +146,7 @@ export default {
             const response = await this.$http.post('/api/auth/register', {
               username: this.registerForm.username,
               password: this.registerForm.password,
+              role: this.registerType,
             });
             
             const result = response.data;

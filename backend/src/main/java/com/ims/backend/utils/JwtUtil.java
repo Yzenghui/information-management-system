@@ -38,12 +38,14 @@ public class JwtUtil {
      *
      * @param username 用户名，将作为令牌的“主题”(subject)
      * @param userId   用户ID，将作为自定义声明(claim)存入令牌负载
+     * @param role     用户角色，将作为自定义声明存入令牌负载
      * @return 生成的JWT令牌字符串（格式：Header.Payload.Signature）
      */
-    public String generateToken(String username, Integer userId) {
+    public String generateToken(String username, Integer userId,String role) {
         // 创建自定义声明（Claims）Map，用于存放业务数据
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId); // 将用户ID存入令牌，后续可直接取出，无需查库
+        claims.put("role", role);
 
         // 使用Jwts构建器流畅地创建令牌
         return Jwts.builder()
@@ -83,6 +85,21 @@ public class JwtUtil {
                 .parseSignedClaims(token)        // 解析并验证JWT的签名和结构
                 .getPayload()                    // 获取JWT的有效载荷（Payload）
                 .get("userId", Integer.class);   // 从自定义声明中提取用户ID，并转换为Integer类型
+    }
+
+    /**
+     * 从 Token 中解析用户角色。
+     *
+     * @param token JWT 令牌
+     * @return 用户角色
+     */
+    public String getRoleFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(SECRET_KEY)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
     }
 
     /**

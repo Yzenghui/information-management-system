@@ -40,4 +40,11 @@ public class RegisterRequest {
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).*$",
             message = "密码必须包含字母和数字")
     private String password;
+
+    /**
+     * 用户角色。
+     * 可选值：STUDENT（学生）、TEACHER（教师）、ADMIN（管理员）
+     * 默认：STUDENT
+     */
+    private String role;
 }

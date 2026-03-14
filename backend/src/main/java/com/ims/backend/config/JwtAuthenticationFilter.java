@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -13,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * JWT 认证过滤器。
@@ -49,13 +51,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 4. 从 Token 中解析用户信息
                 String username = jwtUtil.getUsernameFromToken(token);
                 Integer userId = jwtUtil.getUserIdFromToken(token);
+                String role = jwtUtil.getRoleFromToken(token);
 
                 // 5. 将用户信息存入 Spring Security 上下文
+
+                // 创建权限列表并添加角色
+                List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                if (role != null && !role.isEmpty()) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+                }
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 username,         //  principal（主体，通常是用户名）
                                 null,             //  credentials（凭证，验证通过后不需要了）
-                                new ArrayList<>() //  authorities（权限列表，暂时为空）
+                                authorities       //  authorities（权限列表）
                         );
 
                 // 存入上下文，这样在整个请求处理过程中都能获取到当前用户

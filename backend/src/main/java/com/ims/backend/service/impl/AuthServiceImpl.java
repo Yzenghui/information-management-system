@@ -70,16 +70,16 @@ public class AuthServiceImpl implements AuthService {
             User user = new User();
             user.setUsername(request.getUsername());
             user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setRole("USER");
+            user.setRole(request.getRole());
             user.setStatus(1);
             user.setCreateTime(LocalDateTime.now());
             user.setUpdateTime(LocalDateTime.now());
 
             // 3. 保存并验证
-            int result = userMapper.insertUser(user);  // ← 返回1表示成功
+            int result = userMapper.insertUser(user);  // 返回1表示成功
             if (result == 1) {
                 user.setPassword(null);
-                return user;  // ← 直接返回我们创建的user对象
+                return user;  // 直接返回创建的user对象
             }
             return null;
         } catch (Exception e) {

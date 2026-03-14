@@ -33,9 +33,19 @@ public class SecurityConfig {
         http
                 // 配置 URL 的访问权限规则
                 .authorizeHttpRequests(auth -> auth
-                        // 规则 1：登录、注册接口无需认证，允许所有人访问
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
-                        // 规则 2：其他所有请求都需要认证
+
+                        // 管理员专属接口
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // 教师和管理员可访问
+                        .requestMatchers("/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")
+
+                        // 学生、教师、管理员都可访问
+                        .requestMatchers("/api/student/**").hasAnyRole("STUDENT","TEACHER", "ADMIN")
+                        .requestMatchers("/api/user/**").authenticated()
+
+                        // 其他所有请求需要认证
                         .anyRequest().authenticated()
                 )
                 // 关闭 CSRF 防护，对于使用 Token 的无状态 REST API 是标准做法
