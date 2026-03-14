@@ -135,17 +135,29 @@ export default {
       } catch (error) {
         console.error("删除请求异常:", error);
 
-        const msg =
-          error.response?.data?.message ||
-          (error.message?.includes("Network Error")
-            ? "网络异常，请确保后端服务已启动"
-            : "删除失败，请稍后重试");
-
-        if (error.response?.status === 401) {
-          this.$message.error("登录已过期，请重新登录");
-          this.$router.push("/login");
+        if (error.response) {
+          const status = error.response.status;
+          if (status === 400) {
+            this.$message.error(error.response.data.message || "删除请求有误");
+          } else if (status === 401) {
+            this.$message.error("登录已过期，请重新登录");
+            this.$router.push("/login");
+          } else if (status === 403) {
+            this.$message.error("无权限删除，请联系管理员");
+          } else if (status === 404) {
+            this.$message.error("记录不存在，可能已被删除");
+          } else if (status === 500) {
+            this.$message.error("服务器内部错误，请稍后重试");
+          } else {
+            const msg = error.response.data?.message || `删除失败 (${status})`;
+            this.$message.error(msg);
+          }
+        } else if (error.code === "ECONNABORTED") {
+          this.$message.error("请求超时，请检查网络");
+        } else if (error.message && error.message.includes("Network Error")) {
+          this.$message.error("网络异常，请确保后端服务已启动");
         } else {
-          this.$message.error(msg);
+          this.$message.error("删除失败，请稍后重试");
         }
       } finally {
         this.confirmVisible = false;

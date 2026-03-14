@@ -138,22 +138,22 @@ export default {
     };
   },
   methods: {
-    async handleRegister(){
+    async handleRegister() {
       this.$refs.registerFormRef.validate(async (valid) => {
-        if (valid) { 
+        if (valid) {
           this.loading = true;
           try {
-            const response = await this.$http.post('/api/auth/register', {
+            const response = await this.$http.post("/api/auth/register", {
               username: this.registerForm.username,
               password: this.registerForm.password,
               role: this.registerType,
             });
-            
+
             const result = response.data;
 
-            if(result.code==200){
-              localStorage.setItem('token',result.data.token);
-              localStorage.setItem('username',result.data.username);
+            if (result.code == 200) {
+              localStorage.setItem("token", result.data.token);
+              localStorage.setItem("username", result.data.username);
 
               this.$message.success("注册成功！");
 
@@ -166,7 +166,14 @@ export default {
             if (error.response) {
               const status = error.response.status;
               if (status === 400) {
-                this.$message.error(error.response.data.message || "用户名已存在或信息填写有误");
+                this.$message.error(
+                  error.response.data.message || "用户名已存在或信息填写有误"
+                );
+              } else if (status === 401) {
+                this.$message.error("登录已过期，请重新登录");
+                this.$router.push("/login");
+              } else if (status === 403) {
+                this.$message.error("无权限访问，请联系管理员");
               } else if (status === 404) {
                 this.$message.error("注册接口不存在，请检查后端地址");
               } else if (status === 500) {
@@ -174,9 +181,12 @@ export default {
               } else {
                 this.$message.error(`请求失败 (${status})`);
               }
-            } else if (error.code === 'ECONNABORTED') {
+            } else if (error.code === "ECONNABORTED") {
               this.$message.error("请求超时，请检查网络");
-            } else if (error.message && error.message.includes('Network Error')) {
+            } else if (
+              error.message &&
+              error.message.includes("Network Error")
+            ) {
               this.$message.error("网络异常，请确保后端服务已启动");
             } else {
               this.$message.error("注册失败，请稍后重试");
@@ -185,7 +195,7 @@ export default {
             this.loading = false;
           }
         }
-      })
+      });
     },
 
     goToLogin() {

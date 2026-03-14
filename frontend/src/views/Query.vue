@@ -175,14 +175,22 @@ export default {
 
         if (error.response) {
           const status = error.response.status;
-          if (status === 401) {
+          if (status === 400) {
+            this.$message.error("查询参数有误");
+          } else if (status === 401) {
             this.$message.error("登录已过期，请重新登录");
             this.$router.push("/login");
+          } else if (status === 403) {
+            this.$message.error("无权限查询");
           } else if (status === 404) {
             this.$message.error("查询接口不存在");
+          } else if (status === 500) {
+            this.$message.error("服务器内部错误，请稍后重试");
           } else {
             this.$message.error(`查询失败 (${status})`);
           }
+        } else if (error.code === "ECONNABORTED") {
+          this.$message.error("请求超时，请检查网络");
         } else if (error.message && error.message.includes("Network Error")) {
           this.$message.error("网络异常，请确保后端服务已启动");
         } else {

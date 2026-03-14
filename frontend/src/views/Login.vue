@@ -68,15 +68,13 @@
             {{ loading ? "登录中..." : "登录" }}
           </el-button>
         </el-form-item>
-
       </el-form>
 
       <div class="login-footer">
         <el-link type="primary" @click="goToRegister">
-            还没有账号？立即注册
+          还没有账号？立即注册
         </el-link>
       </div>
-
     </el-card>
   </div>
 </template>
@@ -135,9 +133,9 @@ export default {
           try {
             // 发送POST请求到后端登录接口
             // this.$http 是在 main.js 中挂载的 axios 实例
-            const response = await this.$http.post('/api/auth/login', {
+            const response = await this.$http.post("/api/auth/login", {
               username: this.loginForm.username,
-              password: this.loginForm.password
+              password: this.loginForm.password,
             });
 
             // response.data 是后端返回的 Result 对象
@@ -147,14 +145,14 @@ export default {
             if (result.code === 200) {
               // 登录成功：存储真实 JWT token 到 localStorage
               // 后续每个请求都需要在请求头携带此 token
-              localStorage.setItem('token', result.data.token);
-              
+              localStorage.setItem("token", result.data.token);
+
               // 存储用户名到 localStorage
-              localStorage.setItem('username', result.data.username);
+              localStorage.setItem("username", result.data.username);
 
               // 成功提示：绿色背景，成功图标
               this.$message.success("登录成功！");
-              
+
               // 跳转到首页
               this.$router.push("/");
             } else {
@@ -165,24 +163,29 @@ export default {
           } catch (error) {
             // 网络错误、跨域错误、服务器未启动、超时等异常
             console.error("登录请求异常:", error);
-            
+
             // 详细错误分类处理，提升用户体验
             if (error.response) {
               // 服务器有响应，但返回了错误状态码（4xx、5xx）
               const status = error.response.status;
               if (status === 401) {
                 this.$message.error("用户名或密码错误");
+              } else if (status === 403) {
+                this.$message.error("账号已被锁定，请联系管理员");
               } else if (status === 404) {
                 this.$message.error("登录接口不存在，请检查后端地址");
               } else if (status === 500) {
                 this.$message.error("服务器内部错误，请稍后重试");
               } else {
-                this.$message.error(`请求失败 (${status})`);
+                this.$message.error(`登录失败 (${status})`);
               }
-            } else if (error.code === 'ECONNABORTED') {
+            } else if (error.code === "ECONNABORTED") {
               // 请求超时（axios 默认超时时间 10000ms）
               this.$message.error("请求超时，请检查网络");
-            } else if (error.message && error.message.includes('Network Error')) {
+            } else if (
+              error.message &&
+              error.message.includes("Network Error")
+            ) {
               // 网络错误，通常是后端未启动或跨域配置错误
               this.$message.error("网络异常，请确保后端服务已启动");
             } else {
@@ -199,8 +202,8 @@ export default {
 
     // 跳转到注册页面
     goToRegister() {
-      this.$router.push('/register');
-    }
+      this.$router.push("/register");
+    },
   },
 };
 </script>
@@ -210,35 +213,35 @@ export default {
 /* position: absolute（绝对定位）定位到最近的定位父元素 */
 
 .login-container {
-  min-height: 100vh;       /* 最小高度 = 整个视窗高度 */
-  
-  display: flex;           /* 弹性布局 */
+  min-height: 100vh; /* 最小高度 = 整个视窗高度 */
+
+  display: flex; /* 弹性布局 */
   justify-content: center; /* 水平居中 */
-  align-items: center;     /* 垂直居中 */
-  
-  position: relative;      /* 为背景层提供定位基准 */
-  background: #f5f7fa;   /* 备用背景色 */
+  align-items: center; /* 垂直居中 */
+
+  position: relative; /* 为背景层提供定位基准 */
+  background: #f5f7fa; /* 备用背景色 */
 }
 
 .login-background {
-  position: absolute;      /* 绝对定位，覆盖整个容器 */
-  top: 0; 
+  position: absolute; /* 绝对定位，覆盖整个容器 */
+  top: 0;
   left: 0;
-  right: 0; 
-  bottom: 0; 
-  
-  background: linear-gradient(135deg, #13aabae7 0%, #764ba2 100%  );
-  opacity: 0.8;            /* 80% 透明度 */
+  right: 0;
+  bottom: 0;
+
+  background: linear-gradient(135deg, #13aabae7 0%, #764ba2 100%);
+  opacity: 0.8; /* 80% 透明度 */
 }
 
 .login-card {
-  width: 400px;            /* 80% 透明度 */
-  padding: 40px 30px;      /* 内边距：上下 40px，左右 30px */
-  position: relative;      /* 建立新的堆叠上下文 */
-  z-index: 1;              /* 确保卡片在背景层之上 */
-  box-shadow: 0 10px 30px rgba(7, 181, 161, 0.35) !important;/* 阴影 */
-  border: none;            /* 无边框 */
-  border-radius: 12px;     /* 圆角 */
+  width: 400px; /* 80% 透明度 */
+  padding: 40px 30px; /* 内边距：上下 40px，左右 30px */
+  position: relative; /* 建立新的堆叠上下文 */
+  z-index: 1; /* 确保卡片在背景层之上 */
+  box-shadow: 0 10px 30px rgba(7, 181, 161, 0.35) !important; /* 阴影 */
+  border: none; /* 无边框 */
+  border-radius: 12px; /* 圆角 */
 }
 
 .login-header {
@@ -262,8 +265,8 @@ export default {
 }
 
 .login-button {
-  width: 100%;       /* 父容器为登陆卡片 */
-  margin-top: 10px;  /* 上方留出10像素的间距 */
+  width: 100%; /* 父容器为登陆卡片 */
+  margin-top: 10px; /* 上方留出10像素的间距 */
 }
 
 .login-footer {

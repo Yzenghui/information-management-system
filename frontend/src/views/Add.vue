@@ -200,14 +200,22 @@ export default {
               if (status === 401) {
                 this.$message.error("登录已过期，请重新登录");
                 this.$router.push("/login");
+              } else if (status === 403) {
+                this.$message.error("无权限添加，请联系管理员");
               } else if (status === 404) {
                 this.$message.error("添加接口不存在");
+              } else if (status === 409) {
+                this.$message.error("该记录已存在，请勿重复添加");
+              } else if (status === 500) {
+                this.$message.error("服务器内部错误，请稍后重试");
               } else {
                 // 尝试从 error.response.data 中获取后端返回的错误信息
                 const msg =
                   error.response.data?.message || `添加失败 (${status})`;
                 this.$message.error(msg);
               }
+            } else if (error.code === "ECONNABORTED") {
+              this.$message.error("请求超时，请检查网络");
             } else if (
               error.message &&
               error.message.includes("Network Error")
