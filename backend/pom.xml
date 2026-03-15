@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion> <!-- 指定POM模型版本 -->
+
+	<!-- 继承Spring Boot官方父项目，以获得统一的依赖管理和默认配置 -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.5</version> <!-- 使用Spring Boot 3.2.5版本 -->
+		<relativePath/> <!-- 不从本地路径，而从远程仓库查找父项目 -->
+	</parent>
+
+	<!-- 当前项目的坐标（唯一标识符） -->
+	<groupId>com.ims</groupId>
+	<artifactId>backend</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Information Management System</name>
+	<description>Backend API for IMS</description>
+
+	<!-- 项目属性 -->
+	<properties>
+		<java.version>21</java.version> <!-- 指定使用JDK 21进行编译和运行 -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- 源码文件编码 -->
+	</properties>
+
+	<!-- 项目依赖列表 -->
+	<dependencies>
+		<!-- Web支持：包含内嵌Tomcat、Spring MVC、JSON转换等 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- 参数校验：提供@Valid、@NotBlank等注解进行请求参数验证 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<!-- 数据访问：集成MyBatis和Spring JDBC，自动配置数据源和事务 -->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>3.0.3</version> <!-- 需要明确指定MyBatis Starter版本 -->
+		</dependency>
+
+		<!-- MySQL驱动：用于连接MySQL数据库，runtime范围表示仅在运行时需要 -->
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>9.0.0</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- 安全框架：主要为了使用其BCrypt密码加密工具，也提供了安全基础设施 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- JWT（JSON Web Token）支持 -->
+		<!-- JWT API接口 -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.5</version>
+		</dependency>
+		<!-- JWT 默认实现（运行时提供） -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.12.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- JWT 的Jackson支持（用于JSON序列化/反序列化） -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.12.5</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- 开发工具 -->
+		<!-- Lombok：通过注解在编译时自动生成getter、setter、构造器等代码 -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional> <!-- optional=true表示该依赖不会被传递 -->
+		</dependency>
+		<!-- 开发工具：支持应用热重启、属性默认值等，提升开发体验 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- 测试支持：包含JUnit、Spring Test等测试框架 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<!-- 构建配置 -->
+	<build>
+		<plugins>
+			<!-- Spring Boot Maven插件：用于打包可执行的JAR文件 -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<!-- 从可执行JAR中排除Lombok，因为它只在编译期需要 -->
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
