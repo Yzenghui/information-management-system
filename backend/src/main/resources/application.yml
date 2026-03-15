@@ -1,0 +1,28 @@
+# ==================== 应用核心配置 ====================
+spring:
+  datasource: # 数据源配置：Spring Boot会自动根据此配置创建数据库连接池
+    # 数据库连接URL，指定了协议、地址、端口、数据库名及连接参数
+    url: jdbc:mysql://localhost:3306/ims_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root       # 连接数据库的用户名
+    password: 123456     # 连接数据库的密码
+    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 8.0及以上版本的JDBC驱动类
+    hikari:             # HikariCP连接池的专属配置（Spring Boot默认使用HikariCP）
+      connection-timeout: 30000  # 获取数据库连接的超时时间（毫秒），超过则报错
+
+# ==================== MyBatis 框架配置 ====================
+mybatis:
+  # 实体类别名包路径：MyBatis会扫描此包下的所有类，并为它们注册简称别名
+  # 例如，com.ims.backend.pojo.User 在Mapper XML中可直接简写为 "User"
+  type-aliases-package: com.ims.backend.pojo
+  configuration:        # MyBatis核心配置项
+    # 启用驼峰命名自动映射
+    # 若为true，MyBatis会自动将数据库的 underline_column 字段映射到Java的 underlineColumn 属性
+    map-underscore-to-camel-case: true
+
+# ==================== 日志级别配置 ====================
+logging:
+  level:
+    # 将MyBatis Mapper接口的日志级别设为DEBUG，可在控制台打印出执行的SQL语句及参数，便于调试
+    com.ims.backend.mapper: DEBUG
+    # 设置本项目基础日志级别为INFO，记录一般运行信息，避免DEBUG级别的过多输出
+    com.ims.backend: INFO
