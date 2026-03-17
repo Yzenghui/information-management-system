@@ -8,8 +8,8 @@ import axios from 'axios'
 
 Vue.use(ElementUI)
 
-// 设置后端 API 基础地址
-axios.defaults.baseURL = 'http://localhost:8080'
+// 设置后端 API 基础地址 - 根据环境自动切换
+axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || ''
 
 // 添加请求拦截器 - 自动在每个请求中携带 Token
 axios.interceptors.request.use(

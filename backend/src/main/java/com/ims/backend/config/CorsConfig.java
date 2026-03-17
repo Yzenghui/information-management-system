@@ -13,7 +13,10 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")              // 对所有接口路径启用 CORS
-                .allowedOrigins("http://localhost:8081")    // 允许指定前端源
+                .allowedOrigins(                           // 允许指定前端源
+                        "http://localhost:8081",
+                        "https://*.railway.app"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 允许的 HTTP 方法
                 .allowedHeaders("*")                        // 允许任意请求头
                 .allowCredentials(true)                     // 允许携带 Cookie 等凭据
