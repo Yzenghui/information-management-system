@@ -3,6 +3,7 @@ package com.ims.backend.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -29,35 +30,68 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // 1. 关闭 CSRF（API 项目必需）
+                .csrf(AbstractHttpConfigurer::disable)
+
+                // 2. 启用 CORS（使用 CorsConfig 的 Bean 配置）
+                .cors(Customizer.withDefaults())
+
+                // 3. 配置请求授权
                 .authorizeHttpRequests(auth -> auth
-                        // 放行所有静态资源
+                        // 登录和注册 API - 必须放行
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+
+                        // 静态资源 - 完整放行
                         .requestMatchers(
                                 "/*.js", "/*.css", "/*.png", "/*.jpg", "/*.ico",
-                                "/static/**", "/assets/**", "/css/**", "/js/**", "/fonts/**"
+                                "/static/**", "/assets/**", "/css/**", "/js/**", "/fonts/**",
+                                "/index.html", "/favicon.ico"
                         ).permitAll()
-                        // 放行登录和注册API
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
-                        // 放行前端路由（关键：允许所有路径访问，但不认证）
-                        .requestMatchers("/", "/login", "/register", "/**").permitAll()
-                        // 其他API权限控制
+
+                        // 前端路由 - 放行所有非 API 路径
+                        // 这样前端 SPA 路由才能访问 index.html
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/register",
+                                "/teacher/**",
+                                "/student/**",
+                                "/admin/**",
+                                "/user/**",
+                                "/search/**"
+                        ).permitAll()
+
+                        // 管理接口 - 需要 ADMIN 角色
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasRole("ADMIN")
+
+                        // 教师接口 - 按方法区分权限
                         .requestMatchers(HttpMethod.GET, "/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/teacher/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/teacher/**").hasRole("ADMIN")
+
+                        // 学生接口 - 按方法区分权限
                         .requestMatchers(HttpMethod.GET, "/api/student/**").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/student/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/student/**").hasRole("ADMIN")
+
+                        // 搜索接口 - 需要认证
                         .requestMatchers("/api/search/**").authenticated()
+
+                        // 他所有 API 请求需要认证（必须放在最后！）
                         .anyRequest().authenticated()
                 )
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/", "/**", "/api/**")
-                )
+
+                // 4. 禁用 HTTP Basic 和表单登录（使用 JWT）
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
+
+                // 5. 无状态会话（JWT 不需要 session）
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(
+                                org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
+
+                // 6. 添加 JWT 过滤器
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

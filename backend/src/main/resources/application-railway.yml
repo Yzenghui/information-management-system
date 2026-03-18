@@ -2,18 +2,15 @@ spring:
   config:
     activate:
       on-profile: railway
-
   datasource:
-    url: ${RAILWAY_DATABASE_URL}
-    username: ${RAILWAY_DB_USER}
-    password: ${RAILWAY_DB_PASSWORD}
+    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}
+    username: ${MYSQLUSER}
+    password: ${MYSQLPASSWORD}
     hikari:
       maximum-pool-size: 5
       minimum-idle: 2
-
 server:
   port: ${PORT:8080}
-
 logging:
   level:
     com.ims.backend: INFO
