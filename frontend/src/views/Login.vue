@@ -150,6 +150,9 @@ export default {
               // 存储用户名到 localStorage
               localStorage.setItem("username", result.data.username);
 
+              // 存储用户角色到 localStorage
+              localStorage.setItem("role", result.data.role);
+
               // 成功提示：绿色背景，成功图标
               this.$message.success("登录成功！");
 

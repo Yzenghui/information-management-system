@@ -154,6 +154,7 @@ export default {
             if (result.code == 200) {
               localStorage.setItem("token", result.data.token);
               localStorage.setItem("username", result.data.username);
+              localStorage.setItem("role", result.data.role);
 
               this.$message.success("注册成功！");
 

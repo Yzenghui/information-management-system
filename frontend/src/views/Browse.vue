@@ -27,7 +27,7 @@
         </el-table>
       </el-tab-pane>
       
-      <el-tab-pane label="教师信息" name="teachers">
+      <el-tab-pane label="教师信息" name="teachers" v-if="userRole === 'ADMIN' || userRole === 'TEACHER'">
         <el-table 
           :data="teacherList" 
           v-loading="loading"
@@ -55,6 +55,7 @@ export default {
     return {
       activeTab: "students",
       loading: false,
+      userRole: localStorage.getItem('role') || '', // 从 localStorage 获取用户角色
       screenWidth: document.documentElement.clientWidth, // 获取屏幕宽度用于响应式
       studentList: [],  // 空数组，等待从后端加载
       teacherList: []   // 空数组，等待从后端加载

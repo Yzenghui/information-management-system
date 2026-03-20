@@ -43,12 +43,12 @@
           <span>信息查询</span>
         </el-menu-item>
 
-        <el-menu-item index="/add">
+        <el-menu-item index="/add" v-if="isAdmin()">
           <i class="el-icon-circle-plus"></i>
           <span>信息录入</span>
         </el-menu-item>
 
-        <el-menu-item index="/delete">
+        <el-menu-item index="/delete" v-if="isAdmin()">
           <i class="el-icon-delete"></i>
           <span>信息删除</span>
         </el-menu-item>
@@ -96,6 +96,7 @@ export default {
   data() {
     return {
       username: localStorage.getItem("username"),
+      userRole: localStorage.getItem("role"),
       isCollapse: false, // 控制侧边栏折叠状态
       screenWidth: document.documentElement.clientWidth, // 获取浏览器窗口可视区域的宽度
     };
@@ -118,6 +119,10 @@ export default {
     },
   },
   methods: {
+    // 判断是否为管理员
+    isAdmin() {
+      return this.userRole === 'ADMIN';
+    },
     logout() {
       localStorage.removeItem('token');
       localStorage.removeItem('username');
