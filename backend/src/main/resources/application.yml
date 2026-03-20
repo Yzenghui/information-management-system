@@ -1,14 +1,14 @@
 # ==================== 应用核心配置 ====================
 spring:
   datasource: # 数据源配置：Spring Boot会自动根据此配置创建数据库连接池
-    # 使用环境变量，Railway 会自动注入 DATABASE_URL
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ims_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:123456}
+    # 数据库连接URL，指定了协议、地址、端口、数据库名及连接参数
+    url: jdbc:mysql://localhost:3306/ims_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root       # 连接数据库的用户名
+    password: 123456     # 连接数据库的密码
     driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 8.0及以上版本的JDBC驱动类
     hikari:             # HikariCP连接池的专属配置（Spring Boot默认使用HikariCP）
       connection-timeout: 30000  # 获取数据库连接的超时时间（毫秒），超过则报错
-      maximum-pool-size: ${SPRING_DATASOURCE_MAX_POOL_SIZE:10}
+      maximum-pool-size: 10
 
 
 # ==================== MyBatis 框架配置 ====================

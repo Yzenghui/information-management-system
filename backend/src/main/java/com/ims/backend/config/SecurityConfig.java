@@ -54,16 +54,15 @@ public class SecurityConfig implements WebMvcConfigurer {
                                 "/",
                                 "/login",
                                 "/register",
-                                "/teacher/**",
-                                "/student/**",
-                                "/admin/**",
-                                "/user/**",
-                                "/search/**"
+                                "/browse",
+                                "/query",
+                                "/add",
+                                "/delete",
+                                "/profile"
                         ).permitAll()
 
                         // 管理接口 - 需要 ADMIN 角色
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").hasRole("ADMIN")
 
                         // 教师接口 - 按方法区分权限
                         .requestMatchers(HttpMethod.GET, "/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")
@@ -78,7 +77,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         // 搜索接口 - 需要认证
                         .requestMatchers("/api/search/**").authenticated()
 
-                        // 他所有 API 请求需要认证（必须放在最后！）
+                        // 其他所有 API 请求需要认证
                         .anyRequest().authenticated()
                 )
 
@@ -98,11 +97,13 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
     /**
-     * 前端路由处理：匹配所有不包含点的路径（即排除静态资源）
+     * 前端路由处理
      */
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+        // 匹配所有不包含点的路径（排除静态资源）
         registry.addViewController("/{path:[^\\.]*}")
+                // 转发到 index.html，由 Vue Router 渲染对应组件
                 .setViewName("forward:/index.html");
     }
 
